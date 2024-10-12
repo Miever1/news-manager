@@ -5,8 +5,16 @@
       </ng-template>
       <ng-template pTemplate="end">
           <div class="flex align-items-center gap-2">
-              <input type="text" pInputText placeholder="Search" class="search-input" />
-              <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
+              <input pInputText placeholder="Search" />
+              <ng-container *ngIf="isLoggedIn; else loggedOutTemplate">
+                  <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
+                  <p-button label="Logout" icon="pi pi-sign-out" (click)="logout()"></p-button>
+              </ng-container>
+              <ng-template #loggedOutTemplate>
+                  <ng-container *ngIf="!isLoginPage">
+                      <p-button label="Login" icon="pi pi-sign-in" (click)="login()"></p-button>
+                  </ng-container>
+              </ng-template>
           </div>
       </ng-template>
       <ng-template pTemplate="item" let-item>

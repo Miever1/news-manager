@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ArticleService } from '../services/article.service';
+import { NewsService } from '../services/news.service';
 import { Article } from '../interfaces/article';
 import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
@@ -20,7 +20,7 @@ export class ArticleDetailComponent implements OnInit {
   isLoading: boolean = true;
   error: string | null = null;
 
-  constructor(private route: ActivatedRoute, private articleService: ArticleService, private router: Router) {}
+  constructor(private route: ActivatedRoute, private newsService: NewsService, private router: Router) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -30,7 +30,7 @@ export class ArticleDetailComponent implements OnInit {
   }
 
   getArticleById(id: string): void {
-    this.articleService.getArticleById(id).subscribe(
+    this.newsService.getArticleById(id).subscribe(
       (data: Article) => {
         this.article = data;
         console.log(data)

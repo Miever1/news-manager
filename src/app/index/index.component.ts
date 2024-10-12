@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ArticleService } from '../services/article.service';  
+import { NewsService } from '../services/news.service';  
 import { Article } from '../interfaces/article';  
 import { Router, ActivatedRoute } from '@angular/router';
 import { CardModule } from 'primeng/card';
@@ -24,7 +24,7 @@ export class IndexComponent implements OnInit {
     { label: 'Home', icon: 'pi pi-fw pi-home', command: () => this.showAllArticles() }
   ];
 
-  constructor(private articleService: ArticleService, private router: Router, private route: ActivatedRoute) {}
+  constructor(private newsService: NewsService, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.getArticles();
@@ -39,7 +39,7 @@ export class IndexComponent implements OnInit {
   }
 
   getArticles(): void {
-    this.articleService.getArticles().subscribe((data: Article[]) => {
+    this.newsService.getArticles().subscribe((data: Article[]) => {
 
       console.log(data[0])
       this.articles = data;

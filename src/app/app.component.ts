@@ -1,36 +1,58 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import { ArticleService } from './services/article.service';
+import { NewsService } from './services/news.service';
 import { ArticleList } from './interfaces/article';
 import { MenubarModule } from "primeng/menubar";
 import { AvatarModule } from "primeng/avatar";
+import { InputTextModule } from "primeng/inputtext";
+import { ButtonModule } from "primeng/button";
 import { CommonModule } from '@angular/common';
+import { LoginService } from './services/login.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, MenubarModule, AvatarModule],
+  imports: [
+    ButtonModule,
+    CommonModule,
+    MenubarModule,
+    AvatarModule,
+    InputTextModule
+  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
   items: any[] = [];
-  activeItem: string = ''; // Variable to track the active item
+  activeItem: string = '';
+  isLoggedIn: boolean = false;
+  isLoginPage: boolean = false;
 
-  constructor(private articleService: ArticleService, private router: Router) {}
+  constructor(
+    private newsService: NewsService, 
+    private router: Router,
+    private loginService: LoginService
+  ) {}
 
   ngOnInit(): void {
     this.populateMenuItems();
 
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        this.activeItem = this.router.url; // Update active item based on current URL
+        this.activeItem = this.router.url; 
+        this.isLoginPage = this.router.url === '/login';
       }
+    });
+
+    this.isLoggedIn = this.loginService.isLogged();
+
+    this.loginService.loginStatus$.subscribe(status => {
+      this.isLoggedIn = status;
     });
   }
 
   populateMenuItems(): void {
-    this.articleService.getArticles().subscribe((data: ArticleList[]) => {
+    this.newsService.getArticles().subscribe((data: ArticleList[]) => {
       const categories = this.getCategories(data);
       this.items = [
         { label: 'Home', icon: 'pi pi-fw pi-home', routerLink: '/', command: () => this.goHome() },
@@ -55,5 +77,14 @@ export class AppComponent implements OnInit {
 
   filterByCategory(category: string): void {
     this.router.navigate([`/${category.toLowerCase()}`]);
+  }
+
+  login(): void {
+    this.router.navigate(['/login']);
+  }
+
+  logout(): void {
+    this.isLoggedIn = false;
+    this.router.navigate(['/']);
   }
 }

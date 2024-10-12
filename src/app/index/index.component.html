@@ -1,31 +1,40 @@
 <div class="homepage-container">
     <div class="hero-section" *ngIf="featuredArticle && !isCategoryPage">
         <div class="hero-article">
-            <img [src]="'data:' + featuredArticle.thumbnail_media_type + ';base64,' + featuredArticle.thumbnail_image" 
-                 alt="{{ featuredArticle.title }}" class="hero-img" />
+            <img 
+                [src]="'data:' + featuredArticle.thumbnail_media_type + ';base64,' + featuredArticle.thumbnail_image" 
+                alt="{{ featuredArticle.title }}" 
+                class="hero-img" 
+            />
             <div class="hero-overlay">
                 <div class="hero-content">
                     <h1>{{ featuredArticle.title }}</h1>
                     <p>{{ featuredArticle.abstract }}</p>
-                    <button pButton label="Read More" (click)="navigateToArticle(featuredArticle.id)"></button>
+                    <p-button label="Read More" (click)="navigateToArticle(featuredArticle.id)"></p-button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="article-cards">
-        <h2>{{ title }}</h2>
-        <div class="category-content">
-            <p-card *ngFor="let article of filteredArticles" class="news-card">
-                <ng-template pTemplate="header">
-                    <img [src]="'data:' + article.thumbnail_media_type + ';base64,' + article.thumbnail_image" 
-                         alt="{{ article.title }}" class="news-img">
-                </ng-template>
+    <h2>{{ title }}</h2>
+    <div class="masonry-grid">
+        <p-card *ngFor="let article of filteredArticles" class="news-card masonry-item">
+            <ng-template pTemplate="header">
+                <img 
+                    [src]="'data:' + article.thumbnail_media_type + ';base64,' + article.thumbnail_image" 
+                    alt="{{ article.title }}" 
+                    class="news-img" 
+                    style="height: 150px; object-fit: cover;"
+                />
+            </ng-template>
+            <div class="article-details">
                 <div class="news-category">{{ article.category }}</div>
                 <div class="news-title">{{ article.subtitle }}</div>
                 <div class="news-content">{{ article.abstract }}</div>
-                <button pButton label="Read More" (click)="navigateToArticle(article.id)"></button>
-            </p-card>
-        </div>
+            </div>
+            <ng-template pTemplate="footer">
+                <p-button label="Read More" (click)="navigateToArticle(article.id)"></p-button>
+            </ng-template>
+        </p-card>
     </div>
 </div>
