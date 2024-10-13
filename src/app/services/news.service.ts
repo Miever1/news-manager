@@ -3,13 +3,14 @@ import { Article } from '../interfaces/article';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NewsService {
-  private articlesUrl = 'http://sanger.dia.fi.upm.es/pui-rest-news/articles';
-  private articleDetailUrl = 'http://sanger.dia.fi.upm.es/pui-rest-news/article';
+  private articlesUrl = `${environment.apiBaseUrl}/articles`;
+  private articleDetailUrl = `${environment.apiBaseUrl}/article`;
 
   private APIKEY: string | null;
   private APIKEY_ANON = 'ANON08'; 

@@ -1,0 +1,10 @@
+{
+    "/api": {
+      "target": "http://sanger.dia.fi.upm.es/pui-rest-news",
+      "secure": false,
+      "changeOrigin": true,
+      "pathRewrite": {
+        "^/api": ""
+      }
+    }
+  }
