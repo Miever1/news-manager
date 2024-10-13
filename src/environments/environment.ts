@@ -1,4 +1,4 @@
 export const environment = {
-    production: true,
-    apiBaseUrl: 'http://sanger.dia.fi.upm.es/pui-rest-news'
+    production: false,
+    apiBaseUrl: 'https://sanger.dia.fi.upm.es/pui-rest-news'
   };
