@@ -1,26 +1,26 @@
-<p-card class="article-detail-container" *ngIf="!isLoading">
-    <h2 class="article-title">{{ article?.title }}</h2>
-    <div class="article-meta">
-        <span class="article-subtitle">{{ article?.subtitle }}</span>
-        <span class="article-category">Category: <strong>{{ article?.category }}</strong></span>
-        <span class="article-updated">Last Updated: {{ article?.update_date }}</span>
-        <span class="article-author">By: {{ article?.username }}</span>
+<p-card *ngIf="!isLoading">
+    <div class="article-header">
+        <h2 class="article-title">{{ article?.title }}</h2>
+        <div class="article-meta">
+            <span class="meta-value">{{ article?.subtitle }}</span>
+            <span class="meta-value">{{ article?.category }}</span>
+            <span class="meta-value">{{ article?.update_date | date }}</span>
+            <span class="meta-value">{{ article?.username }}</span>
+        </div>
     </div>
 
     <img [src]="'data:' + article?.thumbnail_media_type + ';base64,' + article?.image_data" 
          alt="{{ article?.title }}" class="article-image">
 
     <div class="article-content">
-        <h3>Summary</h3>
-        <p>{{ article?.abstract }}</p>
+        <p class="abstract">{{ article?.abstract }}</p>
     </div>
 
     <div class="article-body">
-        <h3>Content</h3>
         <p [innerHTML]="article?.body"></p>
     </div>
 
-    <p-button label="Back to Articles" icon="pi pi-arrow-left" (click)="goBack()" class="back-button"></p-button>
+    <p-button label="Back to Articles" icon="pi pi-arrow-left" (click)="goBack()"></p-button>
 
     <div *ngIf="error" class="error-message">{{ error }}</div>
 </p-card>

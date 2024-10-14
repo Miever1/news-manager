@@ -40,8 +40,6 @@ export class IndexComponent implements OnInit {
 
   getArticles(): void {
     this.newsService.getArticles().subscribe((data: Article[]) => {
-
-      console.log(data[0])
       this.articles = data;
       this.filteredArticles = data;
       if (this.articles.length > 0) {

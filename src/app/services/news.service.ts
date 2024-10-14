@@ -30,7 +30,6 @@ export class NewsService {
     if (apikey) {
       this.APIKEY = apikey; 
       this.httpOptions.headers = this.httpOptions.headers.set('Authorization', 'PUIRESTAUTH apikey=' + this.APIKEY);
-      console.log('API key successfully changed to ' + this.APIKEY);
     }
   }
 
