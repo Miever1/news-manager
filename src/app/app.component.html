@@ -1,15 +1,21 @@
 <main class="main">
-  <p-menubar [model]="items" styleClass="custom-menubar">
+  <p-menubar [model]="items">
       <ng-template pTemplate="start">
           <span class="logo">NewsWebsite</span>
       </ng-template>
       <ng-template pTemplate="end">
           <div class="flex align-items-center gap-2">
-              <input pInputText placeholder="Search" />
-              <ng-container *ngIf="isLoggedIn; else loggedOutTemplate">
-                  <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
-                  <p-button label="Logout" icon="pi pi-sign-out" (click)="logout()"></p-button>
-              </ng-container>
+            <ng-container *ngIf="isLoggedIn; else loggedOutTemplate">
+              <p-avatar 
+                image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" 
+                shape="circle" 
+                (click)="onAvatarClick($event, overlayPanel)">
+              </p-avatar>
+              
+              <p-overlayPanel #overlayPanel>
+                <p-button label="Sign out" icon="pi pi-sign-out" (click)="logout()"></p-button>
+              </p-overlayPanel>
+            </ng-container>
               <ng-template #loggedOutTemplate>
                   <ng-container *ngIf="!isLoginPage">
                       <p-button label="Login" icon="pi pi-sign-in" (click)="login()"></p-button>
@@ -20,7 +26,9 @@
       <ng-template pTemplate="item" let-item>
           <a [routerLink]="item.routerLink" class="p-menuitem-link" [ngClass]="{'active-menu-item': activeItem === item.routerLink}">
               <i [class]="item.icon"></i>
-              <span>{{ item.label }}</span>
+              <span class="menu-item-label">
+                {{ item.label }}
+              </span>
           </a>
       </ng-template>
   </p-menubar>
@@ -28,8 +36,15 @@
   <router-outlet></router-outlet>
 
   <footer class="footer-section">
-      <div class="footer-content">
-          <p>&copy; 2024 NewsWebsite. All rights reserved.</p>
-      </div>
+    <div class="footer-content">
+        <div class="footer-left">
+            <a href="/#">Contact Us</a>
+        </div>
+        <p class="footer-center">&copy; 2024 News Manager Project.</p>
+        <div class="footer-right">
+            <a href="/#">Terms of Service</a>
+            <a href="/#">Privacy Policy</a>
+        </div>
+    </div>
   </footer>
 </main>

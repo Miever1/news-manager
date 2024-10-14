@@ -33,7 +33,6 @@ export class ArticleDetailComponent implements OnInit {
     this.newsService.getArticleById(id).subscribe(
       (data: Article) => {
         this.article = data;
-        console.log(data)
         this.isLoading = false;
       },
       (error) => {
