@@ -8,7 +8,7 @@ export const routes: Routes = [
   { path: '', component: IndexComponent },
   { path: 'login', component: LoginComponent },
   { path: ':category', component: IndexComponent },
-  { path: 'article/:id', component: ArticleDetailComponent },
+  { path: ':category/article/:id', component: ArticleDetailComponent },
   { path: '**', redirectTo: '' }
 ];
 

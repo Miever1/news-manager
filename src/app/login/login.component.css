@@ -2,6 +2,50 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #4c8bf5, #1d3d99);
+    min-height: 100%;
+    background: linear-gradient(135deg, #f0f8ff, #d7e1ec);
+}
+
+.login-container {
+    background-color: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+}
+
+.login-title {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #326fd1;
+    margin-bottom: 2.5rem;
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.p-float-label input,
+.p-float-label p-password {
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s;
+}
+
+.p-float-label input:focus,
+.p-float-label p-password:focus {
+    border-color: #326fd1;
+    outline: none;
+}
+
+.error-message {
+    margin-top: 1rem;
+    color: red;
+    text-align: center;
+    font-size: 0.9rem;
 }

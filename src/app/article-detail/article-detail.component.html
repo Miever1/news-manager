@@ -13,7 +13,7 @@
          alt="{{ article?.title }}" class="article-image">
 
     <div class="article-content">
-        <p class="abstract">{{ article?.abstract }}</p>
+        <p [innerHTML]="article?.abstract"></p>
     </div>
 
     <div class="article-body">

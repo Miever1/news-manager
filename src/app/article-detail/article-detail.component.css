@@ -34,10 +34,9 @@
 }
 
 .article-content {
-    padding: 20px;
+    padding: 12px;
     background-color: var(--light-color);
     border-radius: var(--border-radius);
-    margin-bottom: 20px;
 }
 
 .article-content .abstract {
@@ -49,17 +48,13 @@
 }
 
 .article-body {
-    padding: 20px;
+    padding: 12px;
     background-color: var(--white);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     border-radius: var(--border-radius);
     line-height: 1.7;
     font-size: 1rem;
     margin-bottom: 20px;
-}
-
-.article-body p {
-    margin-bottom: 1.5rem;
 }
 
 .loading-spinner {
