@@ -1,37 +1,47 @@
 <div class="login-page">
-    <p-card>
-        <h2 class="login-title">Login</h2>
+    <div class="login-container">
+        <h2 class="login-title">Sign in to your News account</h2>
         <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
             <div class="form-group">
-                <label for="username" class="p-label">Username</label>
-                <input
-                    required
-                    pInputText
-                    id="username" 
-                    name="username"
-                    [(ngModel)]="username" 
-                    placeholder="Enter your username"
-                />
+                <p-floatLabel>
+                    <input
+                        required
+                        id="username"
+                        name="username"
+                        pInputText
+                        [(ngModel)]="username"
+                        placeholder="Enter your username"
+                        [style]="{'width': '100%'}"
+                    />
+                    <label for="username">Username</label>
+                </p-floatLabel>
             </div>
             <div class="form-group">
-                <label for="password" class="p-label">Password</label>
-                <p-password 
-                    id="password" 
-                    name="password"
-                    [(ngModel)]="password" 
-                    required 
-                    placeholder="Enter your password" 
-                    toggleMask="true">
-                </p-password>
+                <p-floatLabel>
+                    <p-password
+                        required
+                        id="password" 
+                        name="password" 
+                        [(ngModel)]="password"
+                        [toggleMask]="true"
+                        placeholder="Enter your password"
+                        styleClass="p-password p-component p-inputwrapper p-input-icon-right"
+                        [style]="{'width':'100%'}"
+                        [inputStyle]="{'width':'100%'}"
+                    />
+                    <label for="password">Password</label>
+                </p-floatLabel>
             </div>
             <p-button 
-                label="Login" 
+                label="Sign in" 
                 icon="pi pi-sign-in" 
                 type="submit" 
                 [disabled]="!loginForm.valid" 
-                class="login-button">
+                [style]="{'width': '100%'}"
+            >
             </p-button>
         </form>
         <div *ngIf="error" class="error-message">{{ error }}</div>
-    </p-card>
+    </div>
+    <p-toast></p-toast>
 </div>

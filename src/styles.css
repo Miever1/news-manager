@@ -10,3 +10,21 @@ html, body {
     height: 100%;
     background-color: var(--bluegray-50);
 }
+
+ul, li {
+    list-style-type: none; 
+    margin: 0;
+    padding: 0;
+}
+
+app-login {
+    height: 100%;
+}
+
+h2 {
+    margin: 0;
+}
+
+p {
+    margin: 0;
+}

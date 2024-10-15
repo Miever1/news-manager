@@ -43,12 +43,21 @@ export class NewsService {
       catchError(this.handleError<Article[]>('getArticles', []))
     );
   }
-
+  
   getArticleById(id: string): Observable<Article> {
     const url = `${this.articleDetailUrl}/${id}`;
     return this.http.get<Article>(url, this.httpOptions).pipe(
       tap(_ => console.log(`Fetched article details for id=${id}`)),
       catchError(this.handleError<Article>('getArticleById'))
+    );
+  }
+
+  deleteArticle(article: Article | string): Observable<void> {
+    const id = typeof article === 'string' ? article : article.id;
+    const url = `${this.articleDetailUrl}/${id}`;
+    return this.http.delete<void>(url, this.httpOptions).pipe(
+      tap(_ => console.log(`Deleted article id=${id}`)),
+      catchError(this.handleError<void>('deleteArticle'))
     );
   }
 

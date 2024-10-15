@@ -22,7 +22,6 @@
     width: 100%;
 }
 
-/* 调整卡片的样式 */
 .p-card {
     display: inline-block;
     width: 100%;
@@ -119,29 +118,47 @@
     margin-bottom: 20px;
 }
 
-/* Footer */
-.footer-section {
-    width: 100%;
-    background-color: var(--maskbg);
-    padding: 20px;
-    color: var(--primary-color-text);
-    margin-top: 40px;
-    text-align: center;
-    position: relative;
-    box-shadow: 0 -2px 10px var(--shadow);
-}
-
-.footer-content {
+.footer-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
 }
 
-.footer-content p {
+.options-list {
+    list-style-type: none;
+    padding: 0;
     margin: 0;
+}
+
+.option-item {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.option-item:hover {
+    background-color: var(--primary-100);
+}
+
+.delete-item {
+    color: var(--red-800);
+}
+
+.delete-item:hover {
+    background-color: var(--red-500);
+    color: white;
+}
+
+.search-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 @media (max-width: 768px) {

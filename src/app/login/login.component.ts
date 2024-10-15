@@ -7,20 +7,26 @@ import { PasswordModule } from "primeng/password";
 import { InputTextModule } from "primeng/inputtext";
 import { LoginService } from '../services/login.service'; 
 import { CommonModule } from '@angular/common';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
+    ToastModule,
     CommonModule,
     FormsModule,
     ButtonModule,
     InputTextModule,
     CardModule,
-    PasswordModule
+    PasswordModule,
+    FloatLabelModule
   ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
+  providers: [MessageService]
 })
 export class LoginComponent {
   username: string = '';
@@ -29,14 +35,22 @@ export class LoginComponent {
 
   constructor(
     private loginService: LoginService, 
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) {}
 
   onSubmit(): void {
     this.loginService.login(this.username, this.password).subscribe({
       next: (user) => {
         if (user) {
-          this.router.navigate(['/']); 
+          this.messageService.add({
+            severity: 'success',
+            summary: `Welcome back, ${user?.username}!`,
+            detail: 'You have successfully logged in to your News account.',
+          });
+          setTimeout(() => {
+            this.router.navigate(['/']);
+          }, 1000);
         } else {
           this.error = 'Invalid credentials';
         }

@@ -51,6 +51,11 @@
     justify-content: flex-end;
 }
 
+::ng-deep .p-menubar-button {
+    background-color: transparent;
+    color: white;
+}
+
 .p-menuitem-link {
     color: var(--primary-color-text);
     display: flex;
