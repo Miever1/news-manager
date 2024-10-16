@@ -15,7 +15,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
-
 @Component({
   selector: 'app-index',
   standalone: true,
@@ -41,7 +40,7 @@ export class IndexComponent implements OnInit {
   featuredArticle!: Article;
   title: string = "All Articles";
   isCategoryPage: boolean = false;
-  searchTerm: string = ''; // 新增的搜索字段
+  searchTerm: string = '';
 
   items: any[] = [
     { label: 'Home', icon: 'pi pi-fw pi-home', command: () => this.showAllArticles() }
@@ -110,7 +109,7 @@ export class IndexComponent implements OnInit {
     this.isCategoryPage = true;
   }
 
-  onOptionsClick(event: Event, overlayPanel: any): void {
+  onOptionsClick(event: MouseEvent, overlayPanel: any): void {
     overlayPanel.toggle(event);
   }
 
@@ -154,5 +153,9 @@ export class IndexComponent implements OnInit {
     } else {
       this.filteredArticles = this.articles;
     }
+  }
+
+  navigateToCreateArticle() {
+    this.router.navigate(['/create-article']);
   }
 }

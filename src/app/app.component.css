@@ -84,6 +84,11 @@
     flex-grow: 1;
 }
 
+.content-container {
+    flex: 1;
+    overflow-y: auto;
+}
+
 .footer-section {
     width: 100%;
     background-color: var(--primary-500);

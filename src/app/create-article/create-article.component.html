@@ -1,0 +1,79 @@
+<div class="create-article-container grid align-center p-4">
+    <p-panel header="Create New Article" class="col-12 md-8">
+      <form [formGroup]="createArticleForm" (ngSubmit)="onSubmit()">
+        
+        <div class="form-group col-12 field grid nogutter">
+          <label for="title">Title</label>
+          <div class="col-12">
+            <input id="title" type="text" pInputText formControlName="title" placeholder="Enter article title" class="w-full" />
+          </div>
+          <p-message *ngIf="createArticleForm.get('title')?.invalid && createArticleForm.get('title')?.touched" severity="error" text="Title is required"></p-message>
+        </div>
+  
+        <div class="form-group col-12 field grid nogutter">
+          <label for="subtitle">Subtitle</label>
+          <div class="col-12">
+            <input id="subtitle" type="text" pInputText formControlName="subtitle" placeholder="Enter article subtitle" class="w-full" />
+          </div>
+          <p-message *ngIf="createArticleForm.get('subtitle')?.invalid && createArticleForm.get('subtitle')?.touched" severity="error" text="Subtitle is required"></p-message>
+        </div>
+  
+        <div class="form-group col-12 field grid nogutter">
+          <label for="abstract">Abstract</label>
+          <div class="col-12">
+            <textarea id="abstract" pInputTextarea formControlName="abstract" rows="6" placeholder="Enter article abstract" class="w-full"></textarea>
+          </div>
+          <p-message *ngIf="createArticleForm.get('abstract')?.invalid && createArticleForm.get('abstract')?.touched" severity="error" text="Abstract is required"></p-message>
+        </div>
+  
+        <div class="form-group col-12 field grid nogutter">
+          <label for="category">Category</label>
+          <div class="col-12">
+            <p-dropdown id="category" [options]="categories" formControlName="category" placeholder="Select a category"></p-dropdown>
+          </div>
+          <p-message *ngIf="createArticleForm.get('category')?.invalid && createArticleForm.get('category')?.touched" severity="error" text="Category is required"></p-message>
+        </div>
+  
+        <div class="form-group col-12 field grid nogutter">
+          <label for="body">Body</label>
+          <div class="col-12">
+            <textarea id="body" pInputTextarea formControlName="body" rows="8" placeholder="Enter article body" class="w-full"></textarea>
+          </div>
+          <p-message *ngIf="createArticleForm.get('body')?.invalid && createArticleForm.get('body')?.touched" severity="error" text="Content is required"></p-message>
+        </div>
+  
+        <div class="form-group col-12 field grid nogutter">
+          <label for="thumbnail">Thumbnail</label>
+          <div class="col-12">
+            <p-fileUpload name="thumbnail" (onSelect)="onFileSelect($event)" customUpload="true"></p-fileUpload>
+          </div>
+        </div>
+  
+        <div class="col-12 grid justify-end mt-3">
+          <button pButton type="submit" label="Create Article" [disabled]="createArticleForm.invalid" class="mr-2"></button>
+          <button pButton type="button" label="Cancel" class="ml-2 p-button-secondary" (click)="onCancel()"></button>
+        </div>
+      </form>
+    </p-panel>
+  
+    <p-divider></p-divider>
+  
+    <p-panel header="Article Preview" class="col-12 md-8">
+        <div class="preview-content px-3 py-2">
+            <div class="article-header">
+                <h2 class="article-title">{{ title }}</h2>
+                <div class="article-meta">
+                    <span class="meta-value">{{ subtitle }}</span>
+                    <span class="meta-value">{{ category }}</span>
+                </div>
+                <img class="article-image" [src]="selectedThumbnail" alt="Thumbnail preview" />
+                <div class="article-content">
+                    <p [innerHTML]="abstract"></p>
+                </div>
+                <div class="article-body">
+                    <p [innerHTML]="body"></p>
+                </div>
+            </div>
+        </div>
+      </p-panel>
+</div>

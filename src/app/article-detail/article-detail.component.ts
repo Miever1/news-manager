@@ -30,7 +30,7 @@ export class ArticleDetailComponent implements OnInit {
   }
 
   getArticleById(id: string): void {
-    this.newsService.getArticleById(id).subscribe(
+    this.newsService.getArticle(id).subscribe(
       (data: Article) => {
         this.article = data;
         this.isLoading = false;

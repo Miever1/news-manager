@@ -18,16 +18,24 @@
 
     <div class="search-container">
         <h2>{{ title }}</h2>
-        <p-iconField>
-            <p-inputIcon styleClass="pi pi-search"/>
-            <input
-                type="text"
-                pInputText
-                (input)="onSearch()"
-                [(ngModel)]="searchTerm"
-                placeholder="Search articles..."
-            />
-        </p-iconField>
+        <div>
+            <p-button
+                label="Create"
+                class="pr-2"
+                (click)="navigateToCreateArticle()"
+            >
+            </p-button>
+            <p-iconField>
+                <p-inputIcon styleClass="pi pi-search"/>
+                <input
+                    type="text"
+                    pInputText
+                    (input)="onSearch()"
+                    [(ngModel)]="searchTerm"
+                    placeholder="Search articles..."
+                />
+            </p-iconField>
+        </div>
     </div>
 
     <div class="masonry-grid">
@@ -42,7 +50,8 @@
             </ng-template>
             <div class="article-details">
                 <div class="news-category">{{ article.category }}</div>
-                <div class="news-title">{{ article.subtitle }}</div>
+                <div class="news-title">{{ article.title }}</div>
+                <div class="news-subtitle">{{ article.subtitle }}</div>
                 <div class="news-content">
                     <p [innerHTML]="article.abstract"></p>
                 </div>
@@ -51,7 +60,6 @@
             <ng-template pTemplate="footer">
                 <div class="footer-actions">
                     <p-button label="Read More" (click)="navigateToArticle(article.id)"></p-button>
-
                     <div class="article-options" *ngIf="isLoggedIn">
                         <p-button icon="pi pi-ellipsis-h" (click)="onOptionsClick($event, articleOptions)" class="ellipsis-button"></p-button>
                         <p-overlayPanel #articleOptions>
