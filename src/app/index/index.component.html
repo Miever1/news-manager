@@ -22,6 +22,7 @@
             <p-button
                 label="Create"
                 class="pr-2"
+                *ngIf="isLoggedIn"
                 (click)="navigateToCreateArticle()"
             >
             </p-button>
@@ -77,7 +78,7 @@
             </ng-template>
         </p-card>
     </div>
-
+    <p-toast></p-toast>
     <p-confirmDialog
         header="Confirm Delete"
         icon="pi pi-exclamation-triangle" 

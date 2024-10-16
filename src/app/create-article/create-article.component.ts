@@ -16,6 +16,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { DividerModule } from 'primeng/divider';
 import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-create-article',
@@ -43,6 +44,8 @@ export class CreateArticleComponent implements OnInit {
   selectedThumbnail: SafeUrl | null = null;
   isEditMode: boolean = false;
   articleId: string | null = null;
+  imageError: string | null = null;
+  isImageSaved: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -58,7 +61,8 @@ export class CreateArticleComponent implements OnInit {
       abstract: ['', [Validators.required]],
       category: ['', [Validators.required]],
       body: ['', [Validators.required]],
-      thumbnail: ['']
+      image_data: [''],
+      image_media_type: ['']
     });
   }
 
@@ -124,6 +128,40 @@ export class CreateArticleComponent implements OnInit {
     return this.createArticleForm.get('body')?.value || 'Content will appear here';
   }
 
+  onFileSelect(event: any) {
+    this.imageError = null;
+    if (event.files && event.files[0]) {
+      const file = event.files[0];
+      
+      const MAX_SIZE = 20971520;
+      if (file.size > MAX_SIZE) {
+        this.imageError = 'Maximum size allowed is 20MB';
+        return;
+      }
+  
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        this.imageError = 'Only Images are allowed (JPG | PNG)';
+        return;
+      }
+  
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const base64Data = e.target.result;
+        this.selectedThumbnail = this.sanitizer.bypassSecurityTrustUrl(base64Data);
+  
+        const base64Image = base64Data.split(',')[1];
+  
+        this.createArticleForm.patchValue({
+            image_data: base64Image,
+            image_media_type: file.type
+        });
+      };
+  
+      reader.readAsDataURL(file);
+    }
+  }
+
   onSubmit() {
     if (this.createArticleForm.valid) {
       const formData: Article = this.createArticleForm.value;
@@ -153,19 +191,6 @@ export class CreateArticleComponent implements OnInit {
     } else {
       this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please fill all the required fields' });
     }
-  }
-
-  onFileSelect(event: any) {
-    const file = event.files[0];
-    const fileReader = new FileReader();
-    fileReader.onload = () => {
-      this.selectedThumbnail = this.sanitizer.bypassSecurityTrustUrl(fileReader.result as string);
-    };
-    fileReader.readAsDataURL(file);
-
-    this.createArticleForm.patchValue({
-      thumbnail: file
-    });
   }
 
   onCancel() {

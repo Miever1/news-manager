@@ -56,6 +56,52 @@
     color: white;
 }
 
+.user-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.avatar-section {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    margin-right: 15px;
+}
+
+.welcome-message h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0;
+}
+
+.username {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.session-info p {
+    font-size: 1rem;
+    color: #666;
+}
+
+.expiry-time {
+    color: #e74c3c;
+}
+
+.user-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .p-menuitem-link {
     color: var(--primary-color-text);
     display: flex;

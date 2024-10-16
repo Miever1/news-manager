@@ -43,9 +43,9 @@
         </div>
   
         <div class="form-group col-12 field grid nogutter">
-          <label for="thumbnail">Thumbnail</label>
+          <label for="thumbnail_image">Thumbnail</label>
           <div class="col-12">
-            <p-fileUpload name="thumbnail" (onSelect)="onFileSelect($event)" customUpload="true"></p-fileUpload>
+            <p-fileUpload [showUploadButton]="false" name="image_data" (onSelect)="onFileSelect($event)" customUpload="true"></p-fileUpload>
           </div>
         </div>
   
