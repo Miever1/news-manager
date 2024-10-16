@@ -14,11 +14,14 @@ import { LoginService } from '../services/login.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { ToastModule } from 'primeng/toast';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-index',
   standalone: true,
   imports: [
+    ToastModule,
     CommonModule,
     CardModule,
     FormsModule,
@@ -52,11 +55,13 @@ export class IndexComponent implements OnInit {
     private router: Router, 
     private route: ActivatedRoute,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private titleService: Title
   ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = this.loginService.isLogged();
+    this.titleService.setTitle('Welcome to News Website');
     this.getArticles();
     this.route.paramMap.subscribe(params => {
       const category = params.get('category');

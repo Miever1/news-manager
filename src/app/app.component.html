@@ -15,16 +15,24 @@
           <p-overlayPanel #overlayPanel>
             <div class="user-info">
               <div class="avatar-section">
-                <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/walter.jpg" shape="circle" size="large"></p-avatar>
+                <p-avatar 
+                  image="https://primefaces.org/cdn/primeng/images/demo/avatar/walter.jpg" 
+                  shape="circle" 
+                  size="large"
+                  class="user-avatar"
+                ></p-avatar>
+                <div class="welcome-message">
+                  <h3>Welcome back, <span class="username">{{ user?.username }}</span></h3>
+                </div>
               </div>
-              <div>
-                <h3>Welcome back, <span>{{ user?.username }}</span></h3>
-                <p>Session expires: <strong>{{ user?.expires | date: 'MMMM d, y, h:mm a' }}</strong></p>
+            
+              <div class="session-info">
+                <p>Session expires: 
+                  <strong class="expiry-time">{{ user?.expires | date: 'MMMM d, y, h:mm a' }}</strong>
+                </p>
               </div>
             </div>
-            <div class="user-actions">
-              <p-button label="Sign out" icon="pi pi-sign-out" (click)="logout()"></p-button>
-            </div>
+              <p-button class="user-actions mt-3" label="Sign out" icon="pi pi-sign-out" (click)="logout()"></p-button>
           </p-overlayPanel>
         </ng-container>
         <ng-template #loggedOutTemplate>
