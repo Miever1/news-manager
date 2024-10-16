@@ -57,7 +57,6 @@ export class AppComponent implements OnInit {
     });
 
     this.isLoggedIn = this.loginService.isLogged();
-    this.user = this.loginService.getUser();
 
     this.loginService.loginStatus$.subscribe(status => {
       this.isLoggedIn = status;
@@ -105,5 +104,6 @@ export class AppComponent implements OnInit {
 
   onAvatarClick(event: Event, overlayPanel: OverlayPanel): void {
     overlayPanel.toggle(event);
+    this.user = this.loginService.getUser();
   }
 }

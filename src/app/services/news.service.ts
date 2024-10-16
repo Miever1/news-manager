@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 })
 export class NewsService {
   private articlesUrl = `${environment.apiBaseUrl}/articles`;
-  private articleDetailUrl = `${environment.apiBaseUrl}/article`;
+  private articleUrl = `${environment.apiBaseUrl}/article`;
 
   private APIKEY: string | null;
   private APIKEY_ANON = 'ANON08'; 
@@ -44,17 +44,32 @@ export class NewsService {
     );
   }
   
-  getArticleById(id: string): Observable<Article> {
-    const url = `${this.articleDetailUrl}/${id}`;
+  getArticle(id: string): Observable<Article> {
+    const url = `${this.articleUrl}/${id}`;
     return this.http.get<Article>(url, this.httpOptions).pipe(
       tap(_ => console.log(`Fetched article details for id=${id}`)),
-      catchError(this.handleError<Article>('getArticleById'))
+      catchError(this.handleError<Article>('getArticle'))
+    );
+  }
+
+  createArticle(article: Article): Observable<Article> {
+    return this.http.post<Article>(this.articleUrl, article, this.httpOptions).pipe(
+      tap(_ => console.log('Created article')),
+      catchError(this.handleError<Article>('createArticle'))
+    );
+  }
+
+  updateArticle(article: Article): Observable<Article> {
+    const url = `${this.articleUrl}/${article.id}`;
+    return this.http.put<Article>(url, article, this.httpOptions).pipe(
+      tap(_ => console.log(`Updated article id=${article.id}`)),
+      catchError(this.handleError<Article>('updateArticle'))
     );
   }
 
   deleteArticle(article: Article | string): Observable<void> {
     const id = typeof article === 'string' ? article : article.id;
-    const url = `${this.articleDetailUrl}/${id}`;
+    const url = `${this.articleUrl}/${id}`;
     return this.http.delete<void>(url, this.httpOptions).pipe(
       tap(_ => console.log(`Deleted article id=${id}`)),
       catchError(this.handleError<void>('deleteArticle'))
