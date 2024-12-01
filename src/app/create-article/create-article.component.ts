@@ -17,6 +17,7 @@ import { DividerModule } from 'primeng/divider';
 import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
 import * as _ from 'lodash';
+import { ElectronService } from '../services/electron.service';
 
 @Component({
   selector: 'app-create-article',
@@ -46,6 +47,7 @@ export class CreateArticleComponent implements OnInit {
   articleId: string | null = null;
   imageError: string | null = null;
   isImageSaved: boolean = false;
+  isElectronApp: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -53,7 +55,8 @@ export class CreateArticleComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private messageService: MessageService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private electronService: ElectronService
   ) {
     this.createArticleForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -62,13 +65,13 @@ export class CreateArticleComponent implements OnInit {
       category: ['', [Validators.required]],
       body: ['', [Validators.required]],
       image_data: [''],
-      image_media_type: ['']
+      image_media_type: [''],
     });
   }
 
   ngOnInit(): void {
     this.loadCategories();
-
+    this.isElectronApp = this.electronService.isElectron();
     this.route.paramMap.subscribe(params => {
       this.articleId = params.get('id');
       this.isEditMode = !!this.articleId;
@@ -77,6 +80,28 @@ export class CreateArticleComponent implements OnInit {
         this.loadArticleData(this.articleId);
       }
     });
+  }
+
+  showNotification(type: string, message: string, invalidFieldId: string | null = null): void {
+    if (this.isElectronApp) {
+      this.electronService.showNotification(
+        type === 'success' ? 'Success' : 'Error',
+        message
+      );
+      if (invalidFieldId) {
+        this.scrollToField(invalidFieldId);
+      }
+    } else {
+      this.messageService.add({
+        severity: type,
+        summary: type === 'success' ? 'Success' : 'Error',
+        detail: message,
+        key: 'toast',
+        data: { invalidFieldId },
+        sticky: true,
+        closable: true,
+      });
+    }
   }
 
   loadCategories(): void {
@@ -170,26 +195,44 @@ export class CreateArticleComponent implements OnInit {
         formData.id = this.articleId;
         this.newsService.updateArticle(formData).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Article updated successfully' });
+            this.showNotification('success', 'Article updated successfully');
             this.router.navigate(['/']);
           },
-          error: (err) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update article' });
-          }
+          error: () => {
+            this.showNotification('error', 'Failed to update article');
+          },
         });
       } else {
         this.newsService.createArticle(formData).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Article created successfully' });
+            this.showNotification('success', 'Article created successfully');
             this.router.navigate(['/']);
           },
-          error: (err) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create article' });
-          }
+          error: () => {
+            this.showNotification('error', 'Failed to create article');
+          },
         });
       }
     } else {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please fill all the required fields' });
+      const invalidField = this.getFirstInvalidField();
+      this.showNotification('error', 'Please fill all the required fields', invalidField);
+    }
+  }
+
+  getFirstInvalidField(): string | null {
+    for (const key of Object.keys(this.createArticleForm.controls)) {
+      if (this.createArticleForm.controls[key].invalid) {
+        return key;
+      }
+    }
+    return null;
+  }
+
+  scrollToField(fieldName: string): void {
+    const field = document.getElementById(fieldName);
+    if (field) {
+      field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      (field as HTMLElement).focus();
     }
   }
 

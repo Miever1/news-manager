@@ -11,7 +11,7 @@ import { LoginService } from './services/login.service';
 import { OverlayPanelModule, OverlayPanel } from 'primeng/overlaypanel';
 import { User } from './interfaces/user';
 import { FormsModule } from '@angular/forms';
-
+import { ElectronService } from './services/electron.service';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -35,17 +35,25 @@ export class AppComponent implements OnInit {
   user: User | null = null;
   allArticles: ArticleList[] = [];
   filteredArticles: ArticleList[] = [];
+  isElectronApp: boolean = false;
+  isMaximized: boolean = false;
 
   constructor(
     private newsService: NewsService,
     private router: Router,
     private loginService: LoginService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private electronService: ElectronService
   ) {}
 
   ngOnInit(): void {
     this.populateMenuItems();
-
+    if (this.isElectronApp) {
+      window.electronAPI.ipcRenderer.on('window-state-changed', (_event: any, { isMaximized }: { isMaximized: boolean }) => {
+        this.isMaximized = isMaximized;
+      });
+    }
+    this.isElectronApp = this.electronService.isElectron();
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         const url = this.router.url;
@@ -61,6 +69,32 @@ export class AppComponent implements OnInit {
     this.loginService.loginStatus$.subscribe(status => {
       this.isLoggedIn = status;
     });
+  }
+
+  minimizeApp() {
+    if (this.isElectronApp) {
+      window.electronAPI.ipcRenderer.invoke('minimize-app');
+    }
+  }
+
+  maximizeApp() {
+    if (this.isElectronApp) {
+      window.electronAPI.ipcRenderer.invoke('maximize-app');
+      this.isMaximized = true;
+    }
+  }
+
+  restoreApp() {
+    if (this.isElectronApp) {
+      window.electronAPI.ipcRenderer.invoke('restore-app');
+      this.isMaximized = false;
+    }
+  }
+
+  closeApp() {
+    if (this.isElectronApp) {
+      window.electronAPI.ipcRenderer.invoke('close-app');
+    }
   }
 
   populateMenuItems(): void {

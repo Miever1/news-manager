@@ -16,7 +16,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { ToastModule } from 'primeng/toast';
 import { Title } from '@angular/platform-browser';
-
+import { ElectronService } from '../services/electron.service';
 @Component({
   selector: 'app-index',
   standalone: true,
@@ -56,7 +56,8 @@ export class IndexComponent implements OnInit {
     private route: ActivatedRoute,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private titleService: Title
+    private titleService: Title,
+    private electronService: ElectronService
   ) {}
 
   ngOnInit(): void {
@@ -131,14 +132,30 @@ export class IndexComponent implements OnInit {
     });
   }
 
+  showNotification(type: string, message: string): void {
+    if (this.electronService.isElectron()) {
+      this.electronService.showNotification(
+        type === 'success' ? 'Success' : 'Error',
+        message
+      );
+    } else {
+      this.messageService.add({
+        severity: type,
+        summary: type === 'success' ? 'Success' : 'Error',
+        detail: message,
+        key: 'toast',
+      });
+    }
+  }
+
   deleteArticle(articleId: string): void {
     this.newsService.deleteArticle(articleId).subscribe({
       next: () => {
         this.filteredArticles = this.filteredArticles.filter(article => article.id !== articleId);
-        this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Article deleted successfully' });
+        this.showNotification('success', 'Article deleted successfully');
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete the article' });
+        this.showNotification('error', 'Failed to delete the article');
       }
     });
   }

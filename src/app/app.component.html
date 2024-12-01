@@ -1,8 +1,59 @@
 <main class="main">
-  <p-menubar [model]="items">
+  <p-menubar [model]="items" [ngClass]="{'draggable': isElectronApp}">
     <ng-template pTemplate="start">
+      <div class="macos-window-controls" *ngIf="isElectronApp">
+        <p-button
+          icon="pi pi-times"
+          [rounded]="true"
+          (click)="closeApp()"
+          [style]="{
+            width: '14px',
+            height: '14px',
+            padding: '0',
+          }"
+          severity="danger"
+        ></p-button>
+        <p-button
+          icon="pi pi-minus-circle"
+          [rounded]="true"
+          (click)="minimizeApp()"
+          [style]="{
+            width: '14px',
+            height: '14px',
+            padding: '0',
+          }"
+          severity="warning"
+        ></p-button>
+        <div *ngIf="!isMaximized">
+          <p-button
+            icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
+            [rounded]="true"
+            (click)="maximizeApp()"
+            [style]="{
+              width: '14px',
+              height: '14px',
+              padding: '0',
+            }"
+            severity="success"
+          ></p-button>
+        </div>
+        <div *ngIf="isMaximized">
+          <p-button
+            icon="pi pi-arrow-down-left-and-arrow-up-right-to-center"
+            [rounded]="true"
+            (click)="restoreApp()"
+            [style]="{
+              width: '16px',
+              height: '16px',
+              padding: '0',
+            }"
+            severity="success"
+          ></p-button>
+        </div>
+      </div>
       <span class="logo">News</span>
     </ng-template>
+
     <ng-template pTemplate="end">
       <div class="flex align-items-center gap-2">
         <ng-container *ngIf="isLoggedIn; else loggedOutTemplate">

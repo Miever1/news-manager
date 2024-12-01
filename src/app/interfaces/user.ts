@@ -1,6 +1,6 @@
 export interface User {
     username: string;
-    password: string;
+    passwd: string;
     apiKey?: string;
     expires: string;
 }
