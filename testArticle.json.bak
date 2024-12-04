@@ -1,0 +1,6 @@
+{
+  "Title": "My First Article",
+  "Subtitle": "Exploring the Basics of JSON",
+  "Abstract": "This article provides an introduction to JSON and its usage in modern applications.",
+  "Body": "JSON, or JavaScript Object Notation, is a lightweight data format used for exchanging information. It is easy to read and write for both humans and machines. This article dives into how to create and use JSON effectively."
+}

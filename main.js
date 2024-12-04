@@ -1,6 +1,29 @@
-const { app, BrowserWindow, ipcMain, Notification } = require('electron');
+const { app, BrowserWindow, Notification } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
+const { ipcMain, dialog } = require('electron');
+
+ipcMain.handle('import-article', async (event, body) => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{ name: 'JSON Files', extensions: ['json'] }],
+  });
+
+  if (result.canceled || result.filePaths.length === 0) {
+    return { success: false, error: 'No file selected' };
+  }
+
+  const filePath = result.filePaths[0];
+  try {
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const article = JSON.parse(fileContent);
+    return { success: true, article };
+  } catch (error) {
+    return { success: false, error: `Failed to read file: ${error.message}` };
+  }
+});
+
+
 
 const store = new Store();
 let mainWindow;

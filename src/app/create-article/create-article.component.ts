@@ -132,6 +132,11 @@ export class CreateArticleComponent implements OnInit {
     return this.createArticleForm.get('title')?.value || 'Title will appear here';
   }
 
+  set title(value: string) {
+    this.createArticleForm.get('title')?.setValue(value);
+  }
+  
+
   get subtitle() {
     return this.createArticleForm.get('subtitle')?.value || 'Subtitle will appear here';
   }
@@ -276,5 +281,80 @@ export class CreateArticleComponent implements OnInit {
 
   onCancel() {
     this.router.navigate(['/']);
+  }
+
+  async onImport() {
+    console.log('on import');
+    if (this.electronService.isElectron()) {
+      const importedArticle = await this.electronService.importArticle();
+  
+      if (this.articleId) {
+        const { update_date, is_deleted, is_public, ...rest } = importedArticle;
+        Object.assign(this.articleId, rest); // Update existing article
+      } else {
+        this.articleId = importedArticle; // Create a new article
+      }
+  
+      console.log('Article successfully imported:', this.articleId);
+  
+      // Return the imported or updated article for consistency
+      return this.articleId;
+    } else {
+      console.log('not electron');
+      // Web-specific logic
+      return new Promise((resolve, reject) => {
+        const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+        if (!fileInput.files || fileInput.files.length === 0) {
+          return reject('No file selected.');
+        }
+  
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+  
+        reader.onload = (event) => {
+          try {
+            console.log('this also works??');
+            const fileContent = event.target?.result as string;
+            const article = JSON.parse(fileContent);
+            this.setArticleValues(article);
+            resolve(article);
+          } catch (error) {
+            console.error(error);
+          }
+        };
+  
+        reader.onerror = () => {
+          reject('Failed to read file.');
+        };
+  
+        reader.readAsText(file);
+      });
+    }
+  }
+  
+  
+
+  async importArticle() {
+    const importedArticle =
+    await this.electronService.importArticle()
+    if (this.articleId) {
+      const { update_date, is_deleted, is_public, ...rest } = importedArticle
+      Object.assign(this.articleId, rest)
+    }
+  }
+
+  setArticleValues(article: any) {
+    // Validate and assign JSON values to the form controls
+    if (article) {
+      this.createArticleForm.patchValue({
+        title: article.Title || '',
+        subtitle: article.Subtitle || '',
+        abstract: article.Abstract || '',
+        category: article.Category || '',
+        body: article.Body || '',
+      });
+    } else {
+      console.error('Invalid article data');
+    }
   }
 }
