@@ -4,15 +4,6 @@
     flex-direction: column;
 }
 
-.macos-window-controls {
-    display: flex;
-    gap: 4px;
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 1000;
-    -webkit-app-region: no-drag;
-}
 
 .draggable {
     -webkit-app-region: drag;

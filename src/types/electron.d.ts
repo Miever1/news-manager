@@ -10,5 +10,6 @@ declare namespace NodeJS {
       set: (key: string, value: any) => void;
       get: (key: string) => any;
       delete: (key: string) => void;
+      clear: (key: string) => void;
     };
   }

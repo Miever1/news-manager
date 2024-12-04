@@ -83,32 +83,6 @@ export class AppComponent implements OnInit {
     this.isLoggedIn = this.loginService.isLogged();
   }
 
-  minimizeApp() {
-    if (this.isElectronApp) {
-      window.electronAPI.ipcRenderer.invoke('minimize-app');
-    }
-  }
-
-  maximizeApp() {
-    if (this.isElectronApp) {
-      window.electronAPI.ipcRenderer.invoke('maximize-app');
-      this.isMaximized = true;
-    }
-  }
-
-  restoreApp() {
-    if (this.isElectronApp) {
-      window.electronAPI.ipcRenderer.invoke('restore-app');
-      this.isMaximized = false;
-    }
-  }
-
-  closeApp() {
-    if (this.isElectronApp) {
-      window.electronAPI.ipcRenderer.invoke('close-app');
-    }
-  }
-
   async populateMenuItems(): Promise<void> {
     const data = await lastValueFrom(this.newsService.getArticles());
     const categories = this.getCategories(data || []);

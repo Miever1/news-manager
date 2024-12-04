@@ -99,12 +99,14 @@ export class LoginService {
   private clearUserFromStorage(): void {
     try {
       if (this.electronService.isElectron()) {
+        console.log('[clearUserFromStorage] Deleting from electronStore');
         window.electronStore.delete('loggedInUser');
       } else {
+        console.log('[clearUserFromStorage] Removing from localStorage');
         localStorage.removeItem('loggedInUser');
       }
     } catch (error) {
-      console.error('Error clearing user data from storage:', error);
+      console.error('[clearUserFromStorage] Error clearing user data from storage:', error);
     }
   }
 

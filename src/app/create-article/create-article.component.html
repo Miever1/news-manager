@@ -7,7 +7,7 @@
           <div class="col-12">
             <input id="title" type="text" pInputText formControlName="title" placeholder="Enter article title" class="w-full" />
           </div>
-          <p-message *ngIf="!isElectronApp && createArticleForm.get('title')?.invalid && createArticleForm.get('title')?.touched"  severity="error" text="Title is required"></p-message>
+          <p-message *ngIf="createArticleForm.get('title')?.invalid && createArticleForm.get('title')?.touched"  severity="error" text="Title is required"></p-message>
         </div>
   
         <div class="form-group col-12 field grid nogutter">
@@ -15,7 +15,7 @@
           <div class="col-12">
             <input id="subtitle" type="text" pInputText formControlName="subtitle" placeholder="Enter article subtitle" class="w-full" />
           </div>
-          <p-message *ngIf="!isElectronApp && createArticleForm.get('subtitle')?.invalid && createArticleForm.get('subtitle')?.touched" severity="error" text="Subtitle is required"></p-message>
+          <p-message *ngIf="createArticleForm.get('subtitle')?.invalid && createArticleForm.get('subtitle')?.touched" severity="error" text="Subtitle is required"></p-message>
         </div>
   
         <div class="form-group col-12 field grid nogutter">
@@ -23,7 +23,7 @@
           <div class="col-12">
             <textarea id="abstract" pInputTextarea formControlName="abstract" rows="6" placeholder="Enter article abstract" class="w-full"></textarea>
           </div>
-          <p-message *ngIf="!isElectronApp && createArticleForm.get('abstract')?.invalid && createArticleForm.get('abstract')?.touched" severity="error" text="Abstract is required"></p-message>
+          <p-message *ngIf="createArticleForm.get('abstract')?.invalid && createArticleForm.get('abstract')?.touched" severity="error" text="Abstract is required"></p-message>
         </div>
   
         <div class="form-group col-12 field grid nogutter">
@@ -31,7 +31,7 @@
           <div class="col-12">
             <p-dropdown id="category" [options]="categories" formControlName="category" placeholder="Select a category"></p-dropdown>
           </div>
-          <p-message *ngIf="!isElectronApp && createArticleForm.get('category')?.invalid && createArticleForm.get('category')?.touched" severity="error" text="Category is required"></p-message>
+          <p-message *ngIf="createArticleForm.get('category')?.invalid && createArticleForm.get('category')?.touched" severity="error" text="Category is required"></p-message>
         </div>
   
         <div class="form-group col-12 field grid nogutter">
@@ -39,7 +39,7 @@
           <div class="col-12">
             <textarea id="body" pInputTextarea formControlName="body" rows="8" placeholder="Enter article body" class="w-full"></textarea>
           </div>
-          <p-message *ngIf="!isElectronApp && createArticleForm.get('body')?.invalid && createArticleForm.get('body')?.touched" severity="error" text="Content is required"></p-message>
+          <p-message *ngIf="createArticleForm.get('body')?.invalid && createArticleForm.get('body')?.touched" severity="error" text="Content is required"></p-message>
         </div>
   
         <div class="form-group col-12 field grid nogutter">

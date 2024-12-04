@@ -2,8 +2,11 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronStore', {
   set: (key, value) => ipcRenderer.invoke('store-set', { key, value }),
-  get: (key) => ipcRenderer.invoke('store-get', { key }),
-  delete: (key) => ipcRenderer.invoke('store-delete', { key }),
+  get: (key) => ipcRenderer.invoke('store-get', key),
+  delete: (key) => {
+    console.log('Preload delete called with key:', key);
+    return ipcRenderer.invoke('store-delete', key);
+  },
   clear: () => ipcRenderer.invoke('store-clear'),
 });
 

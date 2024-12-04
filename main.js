@@ -34,7 +34,9 @@ function createMainWindow() {
     width: 1200,
     height: 800,
     show: false,
-    frame: false,
+    frame: true,
+    transparent: true,
+    titleBarStyle: 'hidden',
     webPreferences: {
       contextIsolation: true,
       preload: preloadPath,
@@ -75,20 +77,21 @@ function createMainWindow() {
       function applyCustomStyles() {
         const style = document.createElement('style');
         style.textContent = \`
-          a { 
-            cursor: default !important;
-          }
-          button {
+          * {
             user-select: none !important;
             -webkit-user-select: none !important;
+            -ms-user-select: none !important;
+            -moz-user-select: none !important;
+          }
+          a, button, input, textarea {
             cursor: default !important;
           }
         \`;
         document.head.appendChild(style);
       }
-
+  
       applyCustomStyles();
-
+  
       const observer = new MutationObserver(() => applyCustomStyles());
       observer.observe(document.body, { childList: true, subtree: true });
     `);
@@ -116,6 +119,17 @@ ipcMain.handle('window-ready', () => {
   }
 });
 
+ipcMain.handle('show-notification', async (_, { title, body }) => {
+  if (Notification.isSupported()) {
+    console.log('[show-notification] Showing notification:', { title, body });
+    new Notification({ title, body }).show();
+    return { success: true };
+  } else {
+    console.error('[show-notification] Notifications are not supported on this platform.');
+    return { success: false, error: 'Notifications not supported on this platform.' };
+  }
+});
+
 ipcMain.handle('store-set', async (_, { key, value }) => {
   try {
     store.set(key, value);
@@ -139,6 +153,10 @@ ipcMain.handle('store-get', async (_, key) => {
 });
 
 ipcMain.handle('store-delete', async (_, key) => {
+  if (typeof key !== 'string') {
+    return { success: false, error: 'Invalid key type. Key must be a string.' };
+  }
+
   try {
     store.delete(key);
     console.log(`[store-delete] Key "${key}" deleted successfully`);
@@ -160,37 +178,6 @@ ipcMain.handle('store-clear', async () => {
   }
 });
 
-ipcMain.handle('close-app', () => {
-  console.log('[close-app] Closing the application');
-  if (mainWindow) mainWindow.close();
-});
-
-ipcMain.handle('minimize-app', () => {
-  console.log('[minimize-app] Minimizing the application');
-  if (mainWindow) mainWindow.minimize();
-});
-
-ipcMain.handle('maximize-app', () => {
-  console.log('[maximize-app] Maximizing the application');
-  if (mainWindow) mainWindow.maximize();
-});
-
-ipcMain.handle('restore-app', () => {
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) {
-      console.log('[restore-app] Window is minimized. Restoring...');
-      mainWindow.restore();
-    } else if (mainWindow.isMaximized()) {
-      console.log('[restore-app] Window is maximized. Unmaximizing...');
-      mainWindow.unmaximize();
-    } else {
-      console.log('[restore-app] Window is in normal state. Focusing...');
-      mainWindow.focus();
-    }
-  } else {
-    console.error('[restore-app] No mainWindow instance found.');
-  }
-});
 
 // Application Lifecycle
 app.on('ready', createMainWindow);
