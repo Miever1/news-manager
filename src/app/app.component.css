@@ -19,14 +19,18 @@
     background-color: #f8f8f8;
   }
   
-.draggable .p-button,
-.draggable .p-avatar,
-.draggable a {
+#login-button {
+    -webkit-app-region: no-drag;
+}
+
+#login-button,
+.draggable a,
+::ng-deep .ng-star-inserted {
     -webkit-app-region: no-drag;
 }
 
 .logo {
-    padding-left: 48px;
+    margin-left: 64px !important;
     font-size: 2rem;
     font-weight: bold;
     color: white;
@@ -38,6 +42,8 @@
     text-decoration: none;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease, color 0.3s ease;
+    -webkit-app-region: no-drag;
+    cursor: pointer;
 }
 
 .logo:hover {

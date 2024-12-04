@@ -10,9 +10,14 @@ contextBridge.exposeInMainWorld('electronStore', {
 contextBridge.exposeInMainWorld('electronAPI', {
   ipcRenderer: {
     invoke: (channel, args) => ipcRenderer.invoke(channel, args),
+    on: (channel, listener) => ipcRenderer.on(channel, listener),
+    removeListener: (channel, listener) => ipcRenderer.removeListener(channel, listener),
   },
   showNotification: (title, body) => {
     console.log('showNotification called in preload.js:', title, body);
     ipcRenderer.invoke('show-notification', { title, body });
-  }
+  },
+  windowReady: () => {
+    ipcRenderer.invoke('window-ready');
+  },
 });

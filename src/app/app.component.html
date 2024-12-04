@@ -51,7 +51,7 @@
           ></p-button>
         </div>
       </div>
-      <span class="logo">News</span>
+      <a class="logo" (click)="goHome()">News</a>
     </ng-template>
 
     <ng-template pTemplate="end">
@@ -88,7 +88,7 @@
         </ng-container>
         <ng-template #loggedOutTemplate>
           <ng-container *ngIf="!isLoginPage">
-            <p-button label="Login" icon="pi pi-sign-in" (click)="login()"></p-button>
+            <p-button label="Login" icon="pi pi-sign-in" (click)="login()" id="login-button"></p-button>
           </ng-container>
         </ng-template>
       </div>
