@@ -23,8 +23,6 @@ ipcMain.handle('import-article', async (event, body) => {
   }
 });
 
-
-
 const store = new Store();
 let mainWindow;
 
@@ -70,6 +68,31 @@ function createMainWindow() {
         app.quit();
       });
   }
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('[Main Process] DOM has finished loading, applying custom styles');
+    mainWindow.webContents.executeJavaScript(`
+      function applyCustomStyles() {
+        const style = document.createElement('style');
+        style.textContent = \`
+          a { 
+            cursor: default !important;
+          }
+          button {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            cursor: default !important;
+          }
+        \`;
+        document.head.appendChild(style);
+      }
+
+      applyCustomStyles();
+
+      const observer = new MutationObserver(() => applyCustomStyles());
+      observer.observe(document.body, { childList: true, subtree: true });
+    `);
+  });
 
   mainWindow.on('closed', () => {
     console.log('[Main Process] MainWindow closed');
