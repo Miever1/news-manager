@@ -48,11 +48,6 @@ function createMainWindow() {
       });
   }
 
-  mainWindow.once('ready-to-show', () => {
-    console.log('[Main Process] MainWindow is ready to show');
-    mainWindow.show();
-  });
-
   mainWindow.on('closed', () => {
     console.log('[Main Process] MainWindow closed');
     mainWindow = null;
@@ -64,6 +59,17 @@ function createMainWindow() {
 }
 
 // IPC Handlers
+ipcMain.handle('window-ready', () => {
+  if (mainWindow) {
+    console.log('[window-ready] Window is ready');
+    if (!mainWindow.isVisible()) {
+      mainWindow.show();
+    }
+  } else {
+    console.error('[window-ready] No mainWindow instance found.');
+  }
+});
+
 ipcMain.handle('store-set', async (_, { key, value }) => {
   try {
     store.set(key, value);

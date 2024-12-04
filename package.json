@@ -8,7 +8,7 @@
     "electron": "cross-env NODE_ENV=development electron .",
     "electron:serve": "concurrently \"cross-env NODE_ENV=development ng serve\" \"wait-on http://localhost:4200 --http-timeout 5000 --timeout 60000 && electron .\"",
     "electron:build": "cross-env NODE_ENV=production ng build --configuration production && electron .",
-    "dist": "cross-env NODE_ENV=production ng build --configuration production && electron-builder--win --mac --linux",
+    "dist": "cross-env NODE_ENV=production ng build --configuration production && electron-builder --win --mac --linux",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "postinstall": "electron-builder install-app-deps"
