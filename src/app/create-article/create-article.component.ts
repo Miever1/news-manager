@@ -82,19 +82,16 @@ export class CreateArticleComponent implements OnInit {
     });
   }
 
-  showNotification(type: string, message: string, invalidFieldId: string | null = null): void {
+  showNotification(type: string, title: string, message: string, invalidFieldId: string | null = null): void {
     if (this.isElectronApp) {
-      this.electronService.showNotification(
-        type === 'success' ? 'Success' : 'Error',
-        message
-      );
+      this.electronService.showNotification(title, message);
       if (invalidFieldId) {
         this.scrollToField(invalidFieldId);
       }
     } else {
       this.messageService.add({
         severity: type,
-        summary: type === 'success' ? 'Success' : 'Error',
+        summary: title,
         detail: message,
         key: 'toast',
         data: { invalidFieldId },
@@ -190,33 +187,74 @@ export class CreateArticleComponent implements OnInit {
   onSubmit() {
     if (this.createArticleForm.valid) {
       const formData: Article = this.createArticleForm.value;
-
+  
       if (this.isEditMode && this.articleId) {
         formData.id = this.articleId;
         this.newsService.updateArticle(formData).subscribe({
           next: () => {
-            this.showNotification('success', 'Article updated successfully');
+            this.showNotification('success', 'Article Updated', 'Article updated successfully');
             this.router.navigate(['/']);
           },
           error: () => {
-            this.showNotification('error', 'Failed to update article');
+            this.showNotification('error', 'Error', 'Failed to update article');
           },
         });
       } else {
         this.newsService.createArticle(formData).subscribe({
           next: () => {
-            this.showNotification('success', 'Article created successfully');
+            this.showNotification('success', 'Article created', 'Article created successfully');
             this.router.navigate(['/']);
           },
           error: () => {
-            this.showNotification('error', 'Failed to create article');
+            this.showNotification('error', 'Error', 'Failed to create article');
           },
         });
       }
     } else {
-      const invalidField = this.getFirstInvalidField();
-      this.showNotification('error', 'Please fill all the required fields', invalidField);
+      const invalidField = this.getFirstInvalidField() || '';
+      const fieldLabel = this.getFieldLabel(invalidField || 'Unknown Field');
+      const errorMessages = this.getErrorMessagesForField(invalidField);
+  
+      this.showNotification(
+        'error',
+        `${fieldLabel} is required`,
+        errorMessages.join(' '),
+        invalidField
+      );
     }
+  }
+
+  getFieldLabel(fieldName: string): string {
+    const fieldLabels: { [key: string]: string } = {
+      title: 'Article Title',
+      subtitle: 'Article Subtitle',
+      abstract: 'Abstract',
+      category: 'Category',
+      body: 'Article Body',
+    };
+  
+    return fieldLabels[fieldName] || 'Unknown Field';
+  }
+  
+  getErrorMessagesForField(fieldName: string): string[] {
+    const control = this.createArticleForm.get(fieldName);
+    if (!control || !control.errors) {
+      return [];
+    }
+  
+    const errors = control.errors;
+    const errorMessages: string[] = [];
+  
+    if (errors['required']) {
+      errorMessages.push('Please enter a value.');
+    }
+    if (errors['minlength']) {
+      errorMessages.push(`Minimum length is ${errors['minlength'].requiredLength} characters.`);
+    }
+    if (errors['maxlength']) {
+      errorMessages.push(`Maximum length is ${errors['maxlength'].requiredLength} characters.`);
+    }
+    return errorMessages;
   }
 
   getFirstInvalidField(): string | null {

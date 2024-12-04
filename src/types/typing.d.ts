@@ -4,6 +4,7 @@ declare global {
   interface Window {
     electronAPI: {
       ipcRenderer: IpcRenderer;
+      windowReady: () => void;
     };
   }
 }

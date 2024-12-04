@@ -61,7 +61,9 @@ export class IndexComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.isLoggedIn = this.loginService.isLogged();
+    this.loginService.loginStatus$.subscribe((status) => {
+      this.isLoggedIn = status;
+    });
     this.titleService.setTitle('Welcome to News Website');
     this.getArticles();
     this.route.paramMap.subscribe(params => {

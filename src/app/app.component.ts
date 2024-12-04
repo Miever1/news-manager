@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { NewsService } from './services/news.service';
 import { ArticleList } from './interfaces/article';
@@ -47,28 +48,39 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.populateMenuItems();
+    this.loginService.loginStatus$.subscribe((status) => {
+      this.isLoggedIn = status;
+    });
+  
+    this.isElectronApp = this.electronService.isElectron();
+  
+    this.populateMenuItems().then(() => {
+      if (this.isElectronApp && window.electronAPI) {
+        setTimeout(() => {
+          console.log('Notifying main process that the window is ready...');
+          window.electronAPI.windowReady();
+        }, 2000);
+      }
+    });
+  
     if (this.isElectronApp) {
-      window.electronAPI.ipcRenderer.on('window-state-changed', (_event: any, { isMaximized }: { isMaximized: boolean }) => {
-        this.isMaximized = isMaximized;
+      window.electronAPI.ipcRenderer.on('window-state-changed', (_event: any, data: { isMaximized: boolean }) => {
+        this.isMaximized = data.isMaximized;
       });
     }
-    this.isElectronApp = this.electronService.isElectron();
-    this.router.events.subscribe(event => {
+  
+    this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         const url = this.router.url;
-        const category = this.activatedRoute.firstChild?.snapshot.params['category'] 
-                        || this.activatedRoute.snapshot.params['category'];
+        const category =
+          this.activatedRoute.firstChild?.snapshot.params['category'] ||
+          this.activatedRoute.snapshot.params['category'];
         this.activeItem = category ? `/${category.toLowerCase()}` : '/';
         this.isLoginPage = url === '/login';
       }
     });
-
+  
     this.isLoggedIn = this.loginService.isLogged();
-
-    this.loginService.loginStatus$.subscribe(status => {
-      this.isLoggedIn = status;
-    });
   }
 
   minimizeApp() {
@@ -97,21 +109,20 @@ export class AppComponent implements OnInit {
     }
   }
 
-  populateMenuItems(): void {
-    this.newsService.getArticles().subscribe((data: ArticleList[]) => {
-      const categories = this.getCategories(data);
-      const iconList = ['pi-map-marker', 'pi-bitcoin', 'pi-bolt', 'pi-dollar', 'pi-globe'];
-      
-      this.items = [
-        { label: 'Home', icon: 'pi pi-fw pi-home', routerLink: '/', command: () => this.goHome() },
-        ...categories.map((category, index) => ({
-          label: category,
-          icon: `pi ${iconList[index]}`,
-          routerLink: `/${category.toLowerCase()}`,
-          command: () => this.filterByCategory(category)
-        }))
-      ];
-    });
+  async populateMenuItems(): Promise<void> {
+    const data = await lastValueFrom(this.newsService.getArticles());
+    const categories = this.getCategories(data || []);
+    const iconList = ['pi-map-marker', 'pi-bitcoin', 'pi-bolt', 'pi-dollar', 'pi-globe'];
+  
+    this.items = [
+      { label: 'Home', icon: 'pi pi-fw pi-home', routerLink: '/', command: () => this.goHome() },
+      ...categories.map((category, index) => ({
+        label: category,
+        icon: `pi ${iconList[index]}`,
+        routerLink: `/${category.toLowerCase()}`,
+        command: () => this.filterByCategory(category),
+      })),
+    ];
   }
 
   getCategories(articles: ArticleList[]): string[] {
@@ -133,7 +144,7 @@ export class AppComponent implements OnInit {
 
   logout(): void {
     this.loginService.logout();
-    this.router.navigate(['/']);
+    this.goHome();
   }
 
   onAvatarClick(event: Event, overlayPanel: OverlayPanel): void {
