@@ -5,6 +5,7 @@ import { Article } from '../interfaces/article';
   providedIn: 'root',
 })
 export class ElectronService {
+  
   get ipcRenderer() {
     return window['electronAPI'] ? window['electronAPI'].ipcRenderer : undefined;
   }
@@ -69,6 +70,49 @@ export class ElectronService {
       });
     }
   }
+
+  async exportArticle(article: any): Promise<void> {
+    console.log('Exporting article...');
+    const jsonData = JSON.stringify(article, null, 2); // Format the JSON for readability
+
+    if (this.isElectron() && this.ipcRenderer) {
+        // Electron environment
+        try {
+            const result = await window.Electron.ipcRenderer.invoke('export-article', jsonData);
+            if (result.success) {
+                console.log('Article successfully exported in Electron.');
+            } else {
+                console.error('Failed to export article in Electron:', result.error);
+            }
+        } catch (error) {
+            console.error('Error exporting article in Electron:', error);
+        }
+    } else {
+        // Web environment
+        console.log('Exporting in web environment...');
+        return new Promise((resolve, reject) => {
+            try {
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${article.Title || 'exported_article'}.json`;
+
+                document.body.appendChild(link);
+                link.click(); // Trigger the download
+                document.body.removeChild(link);
+
+                URL.revokeObjectURL(url); // Clean up the object URL
+                console.log('Article successfully exported in the web.');
+                resolve();
+            } catch (error) {
+                console.error('Error exporting article in the web:', error);
+                reject('Failed to export article in the web.');
+            }
+        });
+    }
+}
+
   
   
 }

@@ -357,4 +357,43 @@ export class CreateArticleComponent implements OnInit {
       console.error('Invalid article data');
     }
   }
+
+  async onExport() {
+    console.log('on export');
+    const articleData = this.collectArticleData(); // Collect current article data into an object
+    const jsonData = JSON.stringify(articleData, null, 2); // Pretty-printed JSON for readability
+
+    if (this.electronService.isElectron()) {
+        // Electron-specific logic
+        try {
+            const result = await this.electronService.exportArticle(jsonData);
+        } catch (error) {
+            console.error('Error exporting article:', error);
+        }
+    } else {
+        // Browser-specific logic
+        const blob = new Blob([jsonData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${articleData.Title || 'exported_article'}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        console.log('Article exported as a JSON file.');
+    }
+}
+
+collectArticleData() {
+    // Collect data from form or state to create an exportable JSON object
+    return {
+        Title: this.createArticleForm.get('title')?.value || '',
+        Subtitle: this.createArticleForm.get('subtitle')?.value || '',
+        Abstract: this.createArticleForm.get('abstract')?.value || '',
+        Category: this.createArticleForm.get('category')?.value || '',
+        Body: this.createArticleForm.get('body')?.value || '',
+    };
+}
+
 }
