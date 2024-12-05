@@ -1,7 +1,17 @@
-const { app, BrowserWindow, Notification } = require('electron');
-const path = require('path');
-const Store = require('electron-store');
-const { ipcMain, dialog } = require('electron');
+// const { app, BrowserWindow, Notification } = require('electron');
+// const path = require('path');
+// const Store = require('electron-store');
+// const { ipcMain, dialog } = require('electron');
+
+import { app, BrowserWindow, Notification, ipcMain, dialog} from 'electron';
+import path from 'path';
+import fs from 'fs';
+import waitOn from 'wait-on';
+import Store from 'electron-store';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 ipcMain.handle('import-article', async (event, body) => {
   const result = await dialog.showOpenDialog({
@@ -24,8 +34,8 @@ ipcMain.handle('import-article', async (event, body) => {
 });
 
 ipcMain.handle('export-article', async (event, jsonData) => {
-    const { dialog } = require('electron');
-    const fs = require('fs');
+    // const { dialog } = require('electron');
+    // const fs = require('fs');
 
     const result = await dialog.showSaveDialog({
         title: 'Save Article',
@@ -69,7 +79,7 @@ function createMainWindow() {
 
   if (process.env.NODE_ENV === 'development') {
     console.log('[Main Process] Running in development mode');
-    const waitOn = require('wait-on');
+    // const waitOn = require('wait-on');
     waitOn({ resources: ['http://localhost:4200'], timeout: 60000 }, (err) => {
       if (err) {
         console.error('[Main Process] Angular server not ready:', err);
