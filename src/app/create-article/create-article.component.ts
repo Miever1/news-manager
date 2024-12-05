@@ -288,13 +288,13 @@ export class CreateArticleComponent implements OnInit {
     if (this.electronService.isElectron()) {
       const importedArticle = await this.electronService.importArticle();
   
-      if (this.articleId) {
-        const { update_date, is_deleted, is_public, ...rest } = importedArticle;
-        Object.assign(this.articleId, rest); // Update existing article
-      } else {
+      // if (this.articleId) {
+      //   const { update_date, is_deleted, is_public, ...rest } = importedArticle;
+      //   Object.assign(this.articleId, rest); // Update existing article
+      // } else {
         this.articleId = importedArticle; // Create a new article
-      }
-  
+      // }
+      this.setArticleValues(this.articleId);
       console.log('Article successfully imported:', this.articleId);
   
       // Return the imported or updated article for consistency
@@ -334,14 +334,14 @@ export class CreateArticleComponent implements OnInit {
   
   
 
-  async importArticle() {
-    const importedArticle =
-    await this.electronService.importArticle()
-    if (this.articleId) {
-      const { update_date, is_deleted, is_public, ...rest } = importedArticle
-      Object.assign(this.articleId, rest)
-    }
-  }
+  // async importArticle() {
+  //   const importedArticle =
+  //   await this.electronService.importArticle()
+  //   if (this.articleId) {
+  //     const { update_date, is_deleted, is_public, ...rest } = importedArticle
+  //     Object.assign(this.articleId, rest)
+  //   }
+  // }
 
   setArticleValues(article: any) {
     // Validate and assign JSON values to the form controls
@@ -361,17 +361,17 @@ export class CreateArticleComponent implements OnInit {
   async onExport() {
     console.log('on export');
     const articleData = this.collectArticleData(); // Collect current article data into an object
-    const jsonData = JSON.stringify(articleData, null, 2); // Pretty-printed JSON for readability
 
     if (this.electronService.isElectron()) {
         // Electron-specific logic
         try {
-            const result = await this.electronService.exportArticle(jsonData);
+            const result = await this.electronService.exportArticle(articleData); // Pass raw object
         } catch (error) {
             console.error('Error exporting article:', error);
         }
     } else {
         // Browser-specific logic
+        const jsonData = JSON.stringify(articleData, null, 2); // Pretty-printed JSON for readability
         const blob = new Blob([jsonData], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -384,6 +384,7 @@ export class CreateArticleComponent implements OnInit {
         console.log('Article exported as a JSON file.');
     }
 }
+
 
 collectArticleData() {
     // Collect data from form or state to create an exportable JSON object

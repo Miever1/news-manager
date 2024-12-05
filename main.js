@@ -33,28 +33,28 @@ ipcMain.handle('import-article', async (event, body) => {
   }
 });
 
-ipcMain.handle('export-article', async (event, jsonData) => {
-    // const { dialog } = require('electron');
-    // const fs = require('fs');
+ipcMain.handle('export-article', async (event, articleData) => {
+  const result = await dialog.showSaveDialog({
+      title: 'Save Article',
+      defaultPath: 'article.json',
+      filters: [{ name: 'JSON Files', extensions: ['json'] }],
+  });
 
-    const result = await dialog.showSaveDialog({
-        title: 'Save Article',
-        defaultPath: 'article.json',
-        filters: [{ name: 'JSON Files', extensions: ['json'] }],
-    });
+  if (result.canceled) {
+      return { success: false, error: 'Save operation canceled by user' };
+  }
 
-    if (result.canceled) {
-        return { success: false, error: 'Save operation canceled by user' };
-    }
-
-    const filePath = result.filePath;
-    try {
-        fs.writeFileSync(filePath, jsonData, 'utf8');
-        return { success: true };
-    } catch (error) {
-        return { success: false, error: `Failed to write file: ${error.message}` };
-    }
+  const filePath = result.filePath;
+  try {
+      // Stringify the article data with proper formatting before saving
+      fs.writeFileSync(filePath, JSON.stringify(articleData, null, 2), 'utf8');
+      return { success: true };
+  } catch (error) {
+      return { success: false, error: `Failed to write file: ${error.message}` };
+  }
 });
+
+
 
 
 const store = new Store();
