@@ -68,6 +68,9 @@
                                 <li (click)="editArticle(article.id)" class="option-item">
                                     <i class="pi pi-pencil"></i> Edit
                                 </li>
+                                <li (click)="exportArticle(article.id, articleOptions)" class="option-item">
+                                    <i class="pi pi-file-export"></i> Export
+                                  </li>
                                 <li (click)="confirmDelete(article.id)" class="option-item delete-item">
                                     <i class="pi pi-trash"></i> Delete
                                 </li>
@@ -78,7 +81,7 @@
             </ng-template>
         </p-card>
     </div>
-    <p-toast></p-toast>
+    <p-toast key="toast"></p-toast>
     <p-confirmDialog
         header="Confirm Delete"
         icon="pi pi-exclamation-triangle" 

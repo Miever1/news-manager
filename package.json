@@ -1,22 +1,26 @@
 {
-  "name": "news-manager-project",
-  "version": "0.0.0",
+  "name": "newspapers",
+  "version": "0.0.1",
+  "description": "A modern newspaper management application",
+  "author": "Miever",
   "type": "module",
   "main": "main.js",
+  "icon": "public/favicon.ico", 
   "scripts": {
     "start": "ng serve",
     "build": "ng build --configuration production",
     "electron": "cross-env NODE_ENV=development electron .",
     "electron:serve": "concurrently \"cross-env NODE_ENV=development ng serve\" \"wait-on http://localhost:4200 --http-timeout 5000 --timeout 60000 && electron .\"",
     "electron:build": "cross-env NODE_ENV=production ng build --configuration production && electron .",
-    "dist": "cross-env NODE_ENV=production ng build --configuration production && electron-builder --win",
+    "dist": "cross-env NODE_ENV=production ng build --configuration production && electron-builder --mac --win --linux",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {
-    "appId": "newsmanager",
-    "productName": "NewsManager",
+    "appId": "com.newspapers.app",
+    "productName": "EIT-Newspapers",
+    "icon": "build/icons/icon",
     "files": [
       "dist/**/*",
       "main.js",
@@ -28,15 +32,15 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "build/icons/icon.ico"
+      "icon": "public/favicon.ico"
     },
     "mac": {
       "target": "dmg",
-      "icon": "build/icons/icon.icns"
+      "icon": "public/favicon.icns"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "build/icons"
+      "icon": "public/favicon.png"
     }
   },
   "private": true,

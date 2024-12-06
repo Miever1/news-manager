@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NewsService } from '../services/news.service';
@@ -9,20 +9,23 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MessageModule } from 'primeng/message';
 import { DropdownModule } from 'primeng/dropdown';
-import { FileUploadModule } from 'primeng/fileupload';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
+import { FileUploadModule, FileSelectEvent, FileUpload } from 'primeng/fileupload';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { DividerModule } from 'primeng/divider';
 import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
-import * as _ from 'lodash';
 import { ElectronService } from '../services/electron.service';
 
 @Component({
   selector: 'app-create-article',
   standalone: true,
   imports: [
+    ToastModule,
+    TooltipModule,
     CommonModule,
     ReactiveFormsModule,
     MessageModule,
@@ -40,6 +43,7 @@ import { ElectronService } from '../services/electron.service';
   providers: [MessageService]
 })
 export class CreateArticleComponent implements OnInit {
+  @ViewChild('jsonFileUpload') jsonFileUpload: FileUpload | undefined;
   createArticleForm: FormGroup;
   categories: any[] = [];
   selectedThumbnail: SafeUrl | null = null;
@@ -48,6 +52,11 @@ export class CreateArticleComponent implements OnInit {
   imageError: string | null = null;
   isImageSaved: boolean = false;
   isElectronApp: boolean = false;
+  pendingInvalidFieldId: string | null = null;
+  emptyFormData: any;
+  originalArticleData: any = null;
+
+  showRevertButton = false;
 
   constructor(
     private fb: FormBuilder,
@@ -56,7 +65,8 @@ export class CreateArticleComponent implements OnInit {
     private route: ActivatedRoute,
     private messageService: MessageService,
     private sanitizer: DomSanitizer,
-    private electronService: ElectronService
+    private electronService: ElectronService,
+    private cdRef: ChangeDetectorRef
   ) {
     this.createArticleForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -67,11 +77,13 @@ export class CreateArticleComponent implements OnInit {
       image_data: [''],
       image_media_type: [''],
     });
+    this.emptyFormData = { ...this.createArticleForm.value };
   }
 
   ngOnInit(): void {
     this.loadCategories();
     this.isElectronApp = this.electronService.isElectron();
+
     this.route.paramMap.subscribe(params => {
       this.articleId = params.get('id');
       this.isEditMode = !!this.articleId;
@@ -80,14 +92,21 @@ export class CreateArticleComponent implements OnInit {
         this.loadArticleData(this.articleId);
       }
     });
+
+    if (this.isElectronApp) {
+      this.electronService.onNotificationClick(() => {
+        if (this.pendingInvalidFieldId) {
+          this.scrollToField(this.pendingInvalidFieldId);
+          this.pendingInvalidFieldId = null;
+        }
+      });
+    }
   }
 
   showNotification(type: string, title: string, message: string, invalidFieldId: string | null = null): void {
     if (this.isElectronApp) {
+      this.pendingInvalidFieldId = invalidFieldId || null;
       this.electronService.showNotification(title, message);
-      if (invalidFieldId) {
-        this.scrollToField(invalidFieldId);
-      }
     } else {
       this.messageService.add({
         severity: type,
@@ -98,17 +117,47 @@ export class CreateArticleComponent implements OnInit {
         sticky: true,
         closable: true,
       });
+
+      if (invalidFieldId) {
+        this.scrollToField(invalidFieldId);
+      }
     }
   }
 
   loadCategories(): void {
     this.newsService.getArticles().subscribe((articles: ArticleList[]) => {
-      const uniqueCategories = new Set(articles.map(article => article.category));
-      this.categories = Array.from(uniqueCategories).map(category => ({
-        label: category,
-        value: category
-      }));
+      const uniqueCategories = new Set(articles.map(a => a.category));
+      this.categories = Array.from(uniqueCategories).map(c => ({ label: c, value: c }));
     });
+  }
+
+  get title() { return this.createArticleForm.get('title')?.value || 'Title will appear here'; }
+  get subtitle() { return this.createArticleForm.get('subtitle')?.value || 'Subtitle will appear here'; }
+  get abstract() { return this.createArticleForm.get('abstract')?.value || 'Abstract will appear here'; }
+  get category() {
+    const cat = this.createArticleForm.get('category')?.value;
+    return (this.categories.find(c => c.value === cat)?.label) || 'Category will appear here';
+  }
+  get body() { return this.createArticleForm.get('body')?.value || 'Content will appear here'; }
+
+  private afterJsonImport() {
+    this.originalArticleData = { ...this.createArticleForm.value };
+    this.showRevertButton = true;
+  }
+
+  setArticleValues(article: any) {
+    if (!article) return console.error('Invalid article data');
+    this.createArticleForm.patchValue({
+      title: article.Title || '',
+      subtitle: article.Subtitle || '',
+      abstract: article.Abstract || '',
+      category: article.Category || '',
+      body: article.Body || '',
+      image_data: '',
+      image_media_type: ''
+    });
+    this.afterJsonImport();
+    this.selectedThumbnail = null; 
   }
 
   loadArticleData(id: string): void {
@@ -118,155 +167,73 @@ export class CreateArticleComponent implements OnInit {
         subtitle: article.subtitle,
         abstract: article.abstract,
         category: article.category,
-        body: article.body
+        body: article.body,
+        image_data: article.image_data || '',
+        image_media_type: article.image_media_type || ''
       });
+      this.originalArticleData = { ...this.createArticleForm.value };
+      this.showRevertButton = true;
 
       if (article.image_data && article.image_media_type) {
-        const thumbnailBase64 = `data:${article.image_media_type};base64,${article.image_data}`;
-        this.selectedThumbnail = this.sanitizer.bypassSecurityTrustUrl(thumbnailBase64);
+        const base64 = `data:${article.image_media_type};base64,${article.image_data}`;
+        this.selectedThumbnail = this.sanitizer.bypassSecurityTrustUrl(base64);
+      } else {
+        this.selectedThumbnail = null;
       }
     });
   }
-
-  get title() {
-    return this.createArticleForm.get('title')?.value || 'Title will appear here';
-  }
-
-  set title(value: string) {
-    this.createArticleForm.get('title')?.setValue(value);
-  }
   
-
-  get subtitle() {
-    return this.createArticleForm.get('subtitle')?.value || 'Subtitle will appear here';
-  }
-
-  get abstract() {
-    return this.createArticleForm.get('abstract')?.value || 'Abstract will appear here';
-  }
-
-  get category() {
-    const selectedCategory = this.createArticleForm.get('category')?.value;
-    const categoryLabel = this.categories.find(c => c.value === selectedCategory)?.label;
-    return categoryLabel || 'Category will appear here';
-  }
-
-  get body() {
-    return this.createArticleForm.get('body')?.value || 'Content will appear here';
-  }
-
-  onFileSelect(event: any) {
-    this.imageError = null;
-    if (event.files && event.files[0]) {
-      const file = event.files[0];
-      
-      const MAX_SIZE = 20971520;
-      if (file.size > MAX_SIZE) {
-        this.imageError = 'Maximum size allowed is 20MB';
-        return;
-      }
-  
-      const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
-      if (!ALLOWED_TYPES.includes(file.type)) {
-        this.imageError = 'Only Images are allowed (JPG | PNG)';
-        return;
-      }
-  
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        const base64Data = e.target.result;
-        this.selectedThumbnail = this.sanitizer.bypassSecurityTrustUrl(base64Data);
-  
-        const base64Image = base64Data.split(',')[1];
-  
-        this.createArticleForm.patchValue({
-            image_data: base64Image,
-            image_media_type: file.type
-        });
-      };
-  
-      reader.readAsDataURL(file);
-    }
-  }
-
   onSubmit() {
     if (this.createArticleForm.valid) {
       const formData: Article = this.createArticleForm.value;
-  
-      if (this.isEditMode && this.articleId) {
-        formData.id = this.articleId;
-        this.newsService.updateArticle(formData).subscribe({
-          next: () => {
-            this.showNotification('success', 'Article Updated', 'Article updated successfully');
+      const action = this.articleId
+        ? this.newsService.updateArticle(formData)
+        : this.newsService.createArticle(formData);
+
+      action.subscribe({
+        next: () => {
+          const msg = this.articleId ? 'Article updated' : 'Article created';
+          this.showNotification('success', msg, `${msg} successfully`);
+          setTimeout(() => {
             this.router.navigate(['/']);
-          },
-          error: () => {
-            this.showNotification('error', 'Error', 'Failed to update article');
-          },
-        });
-      } else {
-        this.newsService.createArticle(formData).subscribe({
-          next: () => {
-            this.showNotification('success', 'Article created', 'Article created successfully');
-            this.router.navigate(['/']);
-          },
-          error: () => {
-            this.showNotification('error', 'Error', 'Failed to create article');
-          },
-        });
-      }
+          }, 1000);
+        },
+        error: () => {
+          const msg = this.articleId ? 'Failed to update article' : 'Failed to create article';
+          this.showNotification('error', 'Error', msg);
+        },
+      });
     } else {
       const invalidField = this.getFirstInvalidField() || '';
       const fieldLabel = this.getFieldLabel(invalidField || 'Unknown Field');
-      const errorMessages = this.getErrorMessagesForField(invalidField);
-  
-      this.showNotification(
-        'error',
-        `${fieldLabel} is required`,
-        errorMessages.join(' '),
-        invalidField
-      );
+      const errors = this.getErrorMessagesForField(invalidField);
+      this.showNotification('error', `${fieldLabel} is required`, errors.join(' '), invalidField);
     }
   }
 
   getFieldLabel(fieldName: string): string {
-    const fieldLabels: { [key: string]: string } = {
+    const labels: { [key: string]: string } = {
       title: 'Article Title',
       subtitle: 'Article Subtitle',
       abstract: 'Abstract',
       category: 'Category',
       body: 'Article Body',
     };
-  
-    return fieldLabels[fieldName] || 'Unknown Field';
+    return labels[fieldName] || 'Unknown Field';
   }
-  
+
   getErrorMessagesForField(fieldName: string): string[] {
     const control = this.createArticleForm.get(fieldName);
-    if (!control || !control.errors) {
-      return [];
-    }
-  
+    if (!control || !control.errors) return [];
     const errors = control.errors;
-    const errorMessages: string[] = [];
-  
-    if (errors['required']) {
-      errorMessages.push('Please enter a value.');
-    }
-    if (errors['minlength']) {
-      errorMessages.push(`Minimum length is ${errors['minlength'].requiredLength} characters.`);
-    }
-    if (errors['maxlength']) {
-      errorMessages.push(`Maximum length is ${errors['maxlength'].requiredLength} characters.`);
-    }
-    return errorMessages;
+    const messages: string[] = [];
+    if (errors['required']) messages.push('Please enter a value.');
+    return messages;
   }
 
   getFirstInvalidField(): string | null {
     for (const key of Object.keys(this.createArticleForm.controls)) {
-      if (this.createArticleForm.controls[key].invalid) {
-        return key;
-      }
+      if (this.createArticleForm.controls[key].invalid) return key;
     }
     return null;
   }
@@ -275,7 +242,10 @@ export class CreateArticleComponent implements OnInit {
     const field = document.getElementById(fieldName);
     if (field) {
       field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      (field as HTMLElement).focus();
+      const inputElement = field as HTMLInputElement;
+      setTimeout(() => {
+        inputElement.focus();
+      }, 300);
     }
   }
 
@@ -283,118 +253,84 @@ export class CreateArticleComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  async onImport() {
-    console.log('on import');
-    if (this.electronService.isElectron()) {
-      const importedArticle = await this.electronService.importArticle();
-  
-      // if (this.articleId) {
-      //   const { update_date, is_deleted, is_public, ...rest } = importedArticle;
-      //   Object.assign(this.articleId, rest); // Update existing article
-      // } else {
-        this.articleId = importedArticle; // Create a new article
-      // }
-      this.setArticleValues(this.articleId);
-      console.log('Article successfully imported:', this.articleId);
-  
-      // Return the imported or updated article for consistency
-      return this.articleId;
-    } else {
-      console.log('not electron');
-      // Web-specific logic
-      return new Promise((resolve, reject) => {
-        const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-        if (!fileInput.files || fileInput.files.length === 0) {
-          return reject('No file selected.');
-        }
-  
-        const file = fileInput.files[0];
-        const reader = new FileReader();
-  
-        reader.onload = (event) => {
-          try {
-            console.log('this also works??');
-            const fileContent = event.target?.result as string;
-            const article = JSON.parse(fileContent);
-            this.setArticleValues(article);
-            resolve(article);
-          } catch (error) {
-            console.error(error);
-          }
-        };
-  
-        reader.onerror = () => {
-          reject('Failed to read file.');
-        };
-  
-        reader.readAsText(file);
-      });
-    }
-  }
-  
-  
+  onFileSelect(event: FileSelectEvent) {
+    this.imageError = null;
+    const files = event.files;
+    if (!files || !files[0]) return;
+    const file = files[0];
 
-  // async importArticle() {
-  //   const importedArticle =
-  //   await this.electronService.importArticle()
-  //   if (this.articleId) {
-  //     const { update_date, is_deleted, is_public, ...rest } = importedArticle
-  //     Object.assign(this.articleId, rest)
-  //   }
-  // }
-
-  setArticleValues(article: any) {
-    // Validate and assign JSON values to the form controls
-    if (article) {
-      this.createArticleForm.patchValue({
-        title: article.Title || '',
-        subtitle: article.Subtitle || '',
-        abstract: article.Abstract || '',
-        category: article.Category || '',
-        body: article.Body || '',
-      });
-    } else {
-      console.error('Invalid article data');
-    }
-  }
-
-  async onExport() {
-    console.log('on export');
-    const articleData = this.collectArticleData(); // Collect current article data into an object
-
-    if (this.electronService.isElectron()) {
-        // Electron-specific logic
+    if (file.name.toLowerCase().endsWith('.json')) {
+      const reader = new FileReader();
+      reader.onload = e => {
         try {
-            const result = await this.electronService.exportArticle(articleData); // Pass raw object
-        } catch (error) {
-            console.error('Error exporting article:', error);
+          const content = (e.target as FileReader).result as string;
+          const article = JSON.parse(content);
+          this.setArticleValues(article);
+        } catch (err) {
+          this.showNotification('error', 'Error', 'Failed to parse JSON file');
         }
+      };
+      reader.onerror = () => this.showNotification('error', 'Error', 'Failed to read file');
+      reader.readAsText(file);
     } else {
-        // Browser-specific logic
-        const jsonData = JSON.stringify(articleData, null, 2); // Pretty-printed JSON for readability
-        const blob = new Blob([jsonData], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${articleData.Title || 'exported_article'}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        console.log('Article exported as a JSON file.');
+      const MAX_SIZE = 20971520;
+      if (file.size > MAX_SIZE) {
+        this.imageError = 'Maximum size allowed is 20MB';
+        return;
+      }
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        this.imageError = 'Only Images are allowed (JPG | PNG)';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        const base64Data = (e.target as FileReader).result as string;
+        this.selectedThumbnail = this.sanitizer.bypassSecurityTrustUrl(base64Data);
+        const base64Image = base64Data.split(',')[1];
+        this.createArticleForm.patchValue({ image_data: base64Image, image_media_type: file.type });
+      };
+      reader.readAsDataURL(file);
     }
-}
+  }
+  
+  onJsonFileSelect(event: any) {
+    const files = event.files;
+    if (!files || files.length === 0) {
+      this.onRevert();
+      return;
+    }
 
+    const file = files[0];
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      this.showNotification('error', 'Error', 'Only JSON files are allowed');
+      this.onRevert();
+      return;
+    }
 
-collectArticleData() {
-    // Collect data from form or state to create an exportable JSON object
-    return {
-        Title: this.createArticleForm.get('title')?.value || '',
-        Subtitle: this.createArticleForm.get('subtitle')?.value || '',
-        Abstract: this.createArticleForm.get('abstract')?.value || '',
-        Category: this.createArticleForm.get('category')?.value || '',
-        Body: this.createArticleForm.get('body')?.value || '',
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const content = (e.target as FileReader).result as string;
+        const article = JSON.parse(content);
+        this.setArticleValues(article);
+      } catch (err) {
+        this.showNotification('error', 'Error', 'Failed to parse JSON file');
+        this.onRevert();
+      }
     };
-}
-
+    reader.onerror = () => {
+      this.showNotification('error', 'Error', 'Failed to read file');
+      this.onRevert();
+    };
+    reader.readAsText(file);
+  }
+  
+  onRevert() {
+    this.createArticleForm.reset(this.emptyFormData);
+    this.selectedThumbnail = null;
+    if (this.jsonFileUpload) this.jsonFileUpload.clear();
+    this.showRevertButton = false;
+    this.cdRef.detectChanges();
+  }
 }

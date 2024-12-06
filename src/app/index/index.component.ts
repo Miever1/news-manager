@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { OverlayPanelModule, OverlayPanel } from 'primeng/overlaypanel';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { NewsService } from '../services/news.service'; 
@@ -17,6 +17,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { ToastModule } from 'primeng/toast';
 import { Title } from '@angular/platform-browser';
 import { ElectronService } from '../services/electron.service';
+
 @Component({
   selector: 'app-index',
   standalone: true,
@@ -64,7 +65,7 @@ export class IndexComponent implements OnInit {
     this.loginService.loginStatus$.subscribe((status) => {
       this.isLoggedIn = status;
     });
-    this.titleService.setTitle('Welcome to News Website');
+    this.titleService.setTitle('Welcome to EIT Newspaper');
     this.getArticles();
     this.route.paramMap.subscribe(params => {
       const category = params.get('category');
@@ -117,7 +118,7 @@ export class IndexComponent implements OnInit {
     this.isCategoryPage = true;
   }
 
-  onOptionsClick(event: MouseEvent, overlayPanel: any): void {
+  onOptionsClick(event: MouseEvent, overlayPanel: OverlayPanel): void {
     overlayPanel.toggle(event);
   }
 
@@ -134,18 +135,17 @@ export class IndexComponent implements OnInit {
     });
   }
 
-  showNotification(type: string, message: string): void {
+  showNotification(type: string, message: string, clickAction?: 'openFile'): void {
     if (this.electronService.isElectron()) {
-      this.electronService.showNotification(
-        type === 'success' ? 'Success' : 'Error',
-        message
-      );
+      this.electronService.showNotification(type, message, clickAction);
     } else {
       this.messageService.add({
         severity: type,
         summary: type === 'success' ? 'Success' : 'Error',
         detail: message,
         key: 'toast',
+        sticky: true,
+        closable: true,
       });
     }
   }
@@ -181,5 +181,42 @@ export class IndexComponent implements OnInit {
 
   navigateToCreateArticle() {
     this.router.navigate(['/create-article']);
+  }
+
+  exportArticle(articleId: string, overlayPanel?: OverlayPanel): void {
+    this.newsService.getArticle(articleId).subscribe({
+      next: (fullArticle: Article) => {
+        const articleData = {
+          Title: fullArticle.title || '',
+          Subtitle: fullArticle.subtitle || '',
+          Abstract: fullArticle.abstract || '',
+          Category: fullArticle.category || '',
+          Body: fullArticle.body || '',
+        };
+  
+        if (overlayPanel) {
+          overlayPanel.hide();
+        }
+  
+        this.electronService.exportArticle(articleData)
+          .then((result: { success: boolean; error?: string }) => {
+            if (result.success) {
+              this.showNotification('success', 'Article exported successfully', 'openFile');
+            } else {
+              if (result.error === 'Save operation canceled by user') {
+                console.log('User canceled the save dialog, no notification shown.');
+              } else {
+                this.showNotification('error', 'Failed to export article: ' + (result.error || 'Unknown error'));
+              }
+            }
+          })
+          .catch(err => {
+            this.showNotification('error', 'Failed to export article');
+          });
+      },
+      error: (err) => {
+        this.showNotification('error', 'Failed to fetch article for export');
+      }
+    });
   }
 }

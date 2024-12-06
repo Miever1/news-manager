@@ -57,7 +57,6 @@ export class AppComponent implements OnInit {
     this.populateMenuItems().then(() => {
       if (this.isElectronApp && window.electronAPI) {
         setTimeout(() => {
-          console.log('Notifying main process that the window is ready...');
           window.electronAPI.windowReady();
         }, 2000);
       }

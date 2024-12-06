@@ -4,7 +4,6 @@ contextBridge.exposeInMainWorld('electronStore', {
   set: (key, value) => ipcRenderer.invoke('store-set', { key, value }),
   get: (key) => ipcRenderer.invoke('store-get', key),
   delete: (key) => {
-    console.log('Preload delete called with key:', key);
     return ipcRenderer.invoke('store-delete', key);
   },
   clear: () => ipcRenderer.invoke('store-clear'),
@@ -17,7 +16,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     removeListener: (channel, listener) => ipcRenderer.removeListener(channel, listener),
   },
   showNotification: (title, body) => {
-    console.log('showNotification called in preload.js:', title, body);
     ipcRenderer.invoke('show-notification', { title, body });
   },
   windowReady: () => {
