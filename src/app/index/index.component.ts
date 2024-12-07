@@ -61,10 +61,16 @@ export class IndexComponent implements OnInit {
     private electronService: ElectronService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.loginService.loginStatus$.subscribe((status) => {
       this.isLoggedIn = status;
     });
+    const user = await this.loginService.getUser();
+    if (user) {
+      this.isLoggedIn = true;
+    } else {
+      console.log('No user found in storage.');
+    }
     this.titleService.setTitle('Welcome to EIT Newspaper');
     this.getArticles();
     this.route.paramMap.subscribe(params => {

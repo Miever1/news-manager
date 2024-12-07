@@ -1,7 +1,7 @@
 import { app, BrowserWindow, Notification, ipcMain, dialog, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
-import waitOn from 'wait-on';
+// import waitOn from 'wait-on';
 import Store from 'electron-store';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -23,35 +23,35 @@ function createMainWindow() {
     transparent: true,
     title: "Newspapers",
     titleBarStyle: 'hidden',
+    icon: path.join(__dirname, 'public', 'favicon.png'),
     webPreferences: {
       contextIsolation: true,
       preload: preloadPath,
     },
-    icon: path.join(__dirname, 'public', 'favicon.ico')
   });
 
-  if (process.env.NODE_ENV === 'development') {
-    waitOn({ resources: ['http://localhost:4200'], timeout: 60000 }, (err) => {
-      if (err) {
-        app.quit();
-      } else {
-        mainWindow.loadURL('http://localhost:4200')
-          .then(() => console.log('[Main Process] Loaded Angular server successfully'))
-          .catch(err => {
-            app.quit();
-          });
-        mainWindow.webContents.openDevTools();
-      }
+  // if (process.env.NODE_ENV === 'development') {
+  //   waitOn({ resources: ['http://localhost:4200'], timeout: 60000 }, (err) => {
+  //     if (err) {
+  //       app.quit();
+  //     } else {
+  //       mainWindow.loadURL('http://localhost:4200')
+  //         .then(() => console.log('[Main Process] Loaded Angular server successfully'))
+  //         .catch(err => {
+  //           app.quit();
+  //         });
+  //       mainWindow.webContents.openDevTools();
+  //     }
+  //   });
+  // } else {
+  const filePath = path.join(__dirname, 'dist/news-manager-project/browser/index.html');
+  mainWindow.loadFile(filePath)
+    .then(() => console.log('[Main Process] Loaded production file successfully'))
+    .catch(err => {
+      console.error('[Main Process] Failed to load production file:', err.message, err.stack);
+      app.quit();
     });
-  } else {
-    const filePath = path.join(__dirname, 'dist/news-manager-project/browser/index.html');
-    mainWindow.loadFile(filePath)
-      .then(() => console.log('[Main Process] Loaded production file successfully'))
-      .catch(err => {
-        console.error('[Main Process] Failed to load production file:', err.message, err.stack);
-        app.quit();
-      });
-  }
+  //}
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.executeJavaScript(`
@@ -220,7 +220,20 @@ ipcMain.handle('store-clear', async () => {
 });
 
 // Application Lifecycle
-app.on('ready', createMainWindow);
+app.on('ready', () => {
+  const loggedInUser = store.get('loggedInUser');
+
+  if (!loggedInUser) {
+    console.warn('[Validation] No user data found in config.');
+  } else {
+    console.log('[Validation] User data loaded:', loggedInUser);
+  }
+  createMainWindow();
+});
+
+app.whenReady().then(() => {
+  app.dock.setIcon(path.join(__dirname, 'public', 'favicon.png'));
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

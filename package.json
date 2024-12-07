@@ -1,5 +1,5 @@
 {
-  "name": "newspapers",
+  "name": "eit-newspapers",
   "version": "0.0.1",
   "description": "A modern newspaper management application",
   "author": "Miever",
@@ -20,7 +20,6 @@
   "build": {
     "appId": "com.newspapers.app",
     "productName": "EIT-Newspapers",
-    "icon": "build/icons/icon",
     "files": [
       "dist/**/*",
       "main.js",
@@ -69,7 +68,7 @@
     "@types/jasmine": "~5.1.0",
     "concurrently": "^9.1.0",
     "cross-env": "^7.0.3",
-    "electron": "^33.2.0",
+    "electron": "^33.3.0",
     "electron-builder": "^25.1.8",
     "electron-reload": "^2.0.0-alpha.1",
     "jasmine-core": "~5.2.0",

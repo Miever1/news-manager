@@ -19,7 +19,11 @@ export class LoginService {
   };
 
   constructor(private http: HttpClient, private electronService: ElectronService) {
-    this.user = this.loadUserFromStorage();
+    this.initializeUser();
+  }
+  
+  private async initializeUser() {
+    this.user = await this.loadUserFromStorage();
     this.loginStatusSubject.next(!!this.user);
   }
 
@@ -44,8 +48,8 @@ export class LoginService {
     );
   }
 
-  getUser(): User | null {
-    return this.user;
+  getUser(): Promise<User | null> {
+    return Promise.resolve(this.user);
   }
 
   logout(): void {
@@ -54,8 +58,11 @@ export class LoginService {
     this.loginStatusSubject.next(false);
   }
 
-  private saveUserToStorage(user: User): void {
+  private saveUserToStorage(user: any): void {
     try {
+      const expiresInHours = 24 * 7;
+      user.expires = new Date(new Date().getTime() + expiresInHours * 60 * 60 * 1000).toISOString();
+  
       if (this.electronService.isElectron()) {
         window.electronStore.set('loggedInUser', user);
       } else {
@@ -66,34 +73,43 @@ export class LoginService {
     }
   }
 
-  private loadUserFromStorage(): User | null {
+  private async loadUserFromStorage(): Promise<User | null> {
     try {
       let userData: any;
+  
       if (this.electronService.isElectron()) {
-        userData = window.electronStore.get('loggedInUser');
+        userData = await window.electronStore.get('loggedInUser');
       } else {
         userData = localStorage.getItem('loggedInUser');
         userData = userData ? JSON.parse(userData) : null;
       }
-
+  
       if (userData && this.validateUser(userData)) {
-        return userData as User;
+        return userData.value || userData;
       }
     } catch (error) {
       console.error('Error loading user from storage:', error);
     }
-
+  
     this.clearUserFromStorage();
     return null;
   }
 
   private validateUser(user: any): boolean {
-    if (!user || !user.expires) {
+    const actualUserData = user.value || user;
+  
+    if (!actualUserData || !actualUserData.expires) {
+      console.warn('User validation failed: Missing user or expires field');
       return false;
     }
-
-    const expires = new Date(user.expires);
-    return !isNaN(expires.getTime()) && expires > new Date();
+  
+    const expires = new Date(actualUserData.expires);
+  
+    if (isNaN(expires.getTime()) || expires <= new Date()) {
+      return false;
+    }
+  
+    return true;
   }
 
   private clearUserFromStorage(): void {
