@@ -57,7 +57,6 @@ export class AppComponent implements OnInit {
     this.populateMenuItems().then(() => {
       if (this.isElectronApp && window.electronAPI) {
         setTimeout(() => {
-          console.log('Notifying main process that the window is ready...');
           window.electronAPI.windowReady();
         }, 2000);
       }
@@ -123,6 +122,8 @@ export class AppComponent implements OnInit {
 
   onAvatarClick(event: Event, overlayPanel: OverlayPanel): void {
     overlayPanel.toggle(event);
-    this.user = this.loginService.getUser();
+    this.loginService.getUser().then((user) => {
+      this.user = user;
+    });
   }
 }
