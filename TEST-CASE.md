@@ -106,7 +106,8 @@ The following `build` script and configuration in `package.json` were used to pa
 
 ### **Screenshots**
 - **macOS:** ![macOS App Running](./public/test-case/screenshot2.jpg)
-
+- **Windows:** ![Windows App Running](./public/test-case/screenshot15.jpg)
+- **Linux(Ubuntu):** ![Linux App Running](./public/test-case/screenshot16.jpg)
 ---
 
 ## Test Case 2.1: Notify on Article Creation/Deletion (Electron)
