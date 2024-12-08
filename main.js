@@ -14,6 +14,7 @@ let lastExportedFilePath = null;
 
 function createMainWindow() {
   const preloadPath = path.join(__dirname, 'preload.js');
+  const titleBarStyle = process.platform === 'darwin' ? 'hidden' : 'default';
 
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -22,7 +23,8 @@ function createMainWindow() {
     frame: true,
     transparent: true,
     title: "Newspapers",
-    titleBarStyle: 'hidden',
+    titleBarStyle,
+    autoHideMenuBar: true,
     icon: path.join(__dirname, 'public', 'favicon.png'),
     webPreferences: {
       contextIsolation: true,
