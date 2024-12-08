@@ -3,7 +3,7 @@
     <ng-template pTemplate="header">
       <div class="flex align-items-center justify-content-between w-full">
         <h3 class="m-0">Create New Article</h3>
-        <div class="flex align-items-center">
+        <div class="flex align-items-center" *ngIf="!isEditMode">
           <p-fileUpload
             #jsonFileUpload
             mode="basic"
@@ -90,7 +90,7 @@
       </div>
 
       <div class="col-12 grid justify-end mt-3">
-        <button pButton type="submit" label="Create Article" [disabled]="!isElectronApp && createArticleForm.invalid" class="mr-2"></button>
+        <button pButton type="submit" [label]="isEditMode ? 'Update' : 'Create'" [disabled]="!isElectronApp && createArticleForm.invalid" class="mr-2"></button>
         <button pButton type="button" label="Cancel" class="ml-2 p-button-secondary" (click)="onCancel()"></button>
       </div>
     </form>
