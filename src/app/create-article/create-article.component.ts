@@ -185,7 +185,8 @@ export class CreateArticleComponent implements OnInit {
   
   onSubmit() {
     if (this.createArticleForm.valid) {
-      const formData: Article = this.createArticleForm.value;
+      let formData: Article = this.createArticleForm.value;
+      formData.id = this.articleId || '';
       const action = this.articleId
         ? this.newsService.updateArticle(formData)
         : this.newsService.createArticle(formData);

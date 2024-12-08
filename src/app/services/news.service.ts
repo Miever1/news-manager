@@ -60,8 +60,8 @@ export class NewsService {
   }
 
   updateArticle(article: Article): Observable<Article> {
-    const url = `${this.articleUrl}/${article.id}`;
-    return this.http.put<Article>(url, article, this.httpOptions).pipe(
+    const url = `${this.articleUrl}`;
+    return this.http.post<Article>(url, article, this.httpOptions).pipe(
       tap(_ => console.log(`Updated article id=${article.id}`)),
       catchError(this.handleError<Article>('updateArticle'))
     );

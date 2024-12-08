@@ -6,6 +6,10 @@
     --secondary-color: #9ccc65;
 }
 
+* {
+    font-family: Arial, sans-serif !important;
+}
+
 html, body {
     margin: 0;
     height: 100%;
