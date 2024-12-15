@@ -1,30 +1,31 @@
-<p-card *ngIf="!isLoading">
-    <div class="article-header">
-        <h2 class="article-title">{{ article?.title }}</h2>
-        <div class="article-meta">
-            <span class="meta-value">{{ article?.subtitle }}</span>
-            <span class="meta-value">{{ article?.category }}</span>
-            <span class="meta-value">{{ article?.update_date | date }}</span>
-            <span class="meta-value">{{ article?.username }}</span>
+<div>
+    <div class="loading-overlay" *ngIf="isLoading">
+        <p-progressSpinner aria-label="Loading"></p-progressSpinner>
+    </div>
+    <p-card *ngIf="!isLoading">
+        <div class="article-header">
+            <h2 class="article-title">{{ article?.title }}</h2>
+            <div class="article-meta">
+                <span class="meta-value">{{ article?.subtitle }}</span>
+                <span class="meta-value">{{ article?.category }}</span>
+                <span class="meta-value">{{ article?.update_date | date }}</span>
+                <span class="meta-value">{{ article?.username }}</span>
+            </div>
         </div>
-    </div>
-
-    <img [src]="'data:' + article?.thumbnail_media_type + ';base64,' + article?.image_data" 
-         alt="{{ article?.title }}" class="article-image">
-
-    <div class="article-content">
-        <p [innerHTML]="article?.abstract"></p>
-    </div>
-
-    <div class="article-body">
-        <p [innerHTML]="article?.body"></p>
-    </div>
-
-    <p-button label="Back to Articles" icon="pi pi-arrow-left" (click)="goBack()"></p-button>
-
-    <div *ngIf="error" class="error-message">{{ error }}</div>
-</p-card>
-
-<div *ngIf="isLoading" class="loading-spinner">
-    <p>Loading article...</p>
+    
+        <img [src]="'data:' + article?.thumbnail_media_type + ';base64,' + article?.image_data" 
+             alt="{{ article?.title }}" class="article-image">
+    
+        <div class="article-content">
+            <p [innerHTML]="article?.abstract"></p>
+        </div>
+    
+        <div class="article-body">
+            <p [innerHTML]="article?.body"></p>
+        </div>
+    
+        <p-button label="Back to Articles" icon="pi pi-arrow-left" (click)="goBack()"></p-button>
+    
+        <div *ngIf="error" class="error-message">{{ error }}</div>
+    </p-card>
 </div>

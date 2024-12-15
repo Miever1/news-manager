@@ -1,4 +1,11 @@
+:host {
+    display: flex;
+    flex: 1;
+    height: 100%;
+}
+
 .login-page {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;

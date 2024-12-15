@@ -1,4 +1,7 @@
 <div class="homepage-container">
+    <div class="loading-overlay" *ngIf="loading">
+        <p-progressSpinner aria-label="Loading"></p-progressSpinner>
+    </div>
     <div class="hero-section" *ngIf="featuredArticle && !isCategoryPage">
         <div class="hero-article">
             <img 

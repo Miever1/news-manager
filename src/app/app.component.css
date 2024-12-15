@@ -1,9 +1,18 @@
 .main {
     height: 100%;
-    display: flex;
     flex-direction: column;
 }
 
+.fixed-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: var(--primary-600);
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.5s ease-in-out;
+}
 
 .draggable {
     -webkit-app-region: drag;
@@ -38,7 +47,6 @@
 }
 
 .logo:hover {
-    color: var(--secondary-color);
     transform: scale(1.05);
 }
 
@@ -73,6 +81,11 @@
 ::ng-deep .p-menubar-button {
     background-color: transparent;
     color: white;
+}
+
+p-progressSpinner {
+    width: 50px;
+    height: 50px;
 }
 
 .user-info {
@@ -151,7 +164,10 @@
 
 .content-container {
     flex: 1;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
+    min-height: calc(100% - 128px);
 }
 
 .footer-section {

@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { OverlayPanelModule, OverlayPanel } from 'primeng/overlaypanel';
@@ -31,7 +32,8 @@ import { ElectronService } from '../services/electron.service';
     InputTextModule,
     InputIconModule,
     OverlayPanelModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    ProgressSpinnerModule
   ],
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.css'],
@@ -41,7 +43,20 @@ export class IndexComponent implements OnInit {
   isLoggedIn: boolean = false;
   articles: Article[] = [];
   filteredArticles: Article[] = [];
-  featuredArticle!: Article;
+  featuredArticle: Article = {
+    id: '',
+    title: '',
+    subtitle: '',
+    abstract: '',
+    body: '',
+    category: '',
+    aut: '',
+    thumbnail_image: '',
+    thumbnail_media_type: '',
+    update_date: '',
+    username: ''
+  };
+  loading: boolean = false;
   title: string = "All Articles";
   isCategoryPage: boolean = false;
   searchTerm: string = '';
@@ -84,13 +99,20 @@ export class IndexComponent implements OnInit {
   }
 
   getArticles(): void {
+    this.loading = true;
     this.newsService.getArticles().subscribe((data: Article[]) => {
       this.articles = data;
       this.filteredArticles = data;
       if (this.articles.length > 0) {
-        this.featuredArticle = this.articles[0];
+        const articleWithThumbnail = this.articles.find(article => article.thumbnail_image);
+        if (articleWithThumbnail) {
+          this.featuredArticle = articleWithThumbnail;
+      } else {
+          console.warn('No article with thumbnail_image found.');
+      }
       }
       this.populateMenuItems();
+      this.loading = false;
     });
   }
 
@@ -150,7 +172,6 @@ export class IndexComponent implements OnInit {
         summary: type === 'success' ? 'Success' : 'Error',
         detail: message,
         key: 'toast',
-        sticky: true,
         closable: true,
       });
     }
@@ -161,6 +182,7 @@ export class IndexComponent implements OnInit {
       next: () => {
         this.filteredArticles = this.filteredArticles.filter(article => article.id !== articleId);
         this.showNotification('success', 'Article deleted successfully');
+        this.getArticles();
       },
       error: () => {
         this.showNotification('error', 'Failed to delete the article');
