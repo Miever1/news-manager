@@ -1,7 +1,9 @@
 <main class="main">
-  <p-menubar [model]="items" [ngClass]="{'draggable': isElectronApp}">
+  <p-menubar [model]="items" [ngClass]="{'draggable': isElectronApp, 'fixed-menu': isMenuFixed}">
     <ng-template pTemplate="start">
-      <a class="logo" (click)="goHome()">EIT News</a>
+      <a class="logo" (click)="goHome()">
+        <img src="favicon-white.jpg" alt="EIT News Logo" style="height:48px; margin-right:10px;">EIT News
+      </a>
     </ng-template>
 
     <ng-template pTemplate="end">

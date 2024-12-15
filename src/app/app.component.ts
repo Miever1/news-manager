@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { NewsService } from './services/news.service';
@@ -38,6 +38,7 @@ export class AppComponent implements OnInit {
   filteredArticles: ArticleList[] = [];
   isElectronApp: boolean = false;
   isMaximized: boolean = false;
+  isMenuFixed: boolean = false;
 
   constructor(
     private newsService: NewsService,
@@ -46,6 +47,12 @@ export class AppComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private electronService: ElectronService
   ) {}
+
+  @HostListener('window:scroll', [])
+  onWindowScroll(): void {
+    const scrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
+    this.isMenuFixed = scrollPosition > 80;
+  }
 
   ngOnInit(): void {
     this.loginService.loginStatus$.subscribe((status) => {

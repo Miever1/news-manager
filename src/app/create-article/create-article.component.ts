@@ -114,7 +114,6 @@ export class CreateArticleComponent implements OnInit {
         detail: message,
         key: 'toast',
         data: { invalidFieldId },
-        sticky: true,
         closable: true,
       });
 
@@ -186,7 +185,8 @@ export class CreateArticleComponent implements OnInit {
   onSubmit() {
     if (this.createArticleForm.valid) {
       let formData: Article = this.createArticleForm.value;
-      formData.id = this.articleId || '';
+      // @ts-ignore
+      formData.id = this.articleId || undefined;
       const action = this.articleId
         ? this.newsService.updateArticle(formData)
         : this.newsService.createArticle(formData);

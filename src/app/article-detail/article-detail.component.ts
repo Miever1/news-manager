@@ -6,13 +6,14 @@ import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-article-detail',
   standalone: true,
   templateUrl: './article-detail.component.html',
   styleUrls: ['./article-detail.component.css'],
-  imports: [CommonModule, CardModule, ButtonModule, DividerModule]
+  imports: [CommonModule, CardModule, ButtonModule, DividerModule, ProgressSpinnerModule]
 })
 export class ArticleDetailComponent implements OnInit {
   article!: Article | null;
