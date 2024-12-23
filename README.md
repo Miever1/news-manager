@@ -1,6 +1,6 @@
 # News Manager Project
 
-This is our first project based on Angular, called **News Manager Project**. The goal of this project is to develop a newspaper web application with common functionalities needed to publish and manage a newspaper site.
+This is my first project based on Angular, called **News Manager Project**. The goal of this project is to develop a newspaper web application with common functionalities needed to publish and manage a newspaper site.
 
 ## Features
 
@@ -18,13 +18,6 @@ This project serves as a simplified version of well-known newspaper websites lik
 ## Demo
 
 You can view the live demo of the project at [https://news.miever.net/](https://news.miever.net/).
-
-## Team Members
-
-This project was developed by:
-- **HUOFUER AERMAN**
-- **TRINN BENEDIKT MATTHIAS**
-- **STOEV ROSEN**
 
 ## Project Setup
 

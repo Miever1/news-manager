@@ -1,4 +1,7 @@
 <div class="create-article-container grid align-center p-4">
+  <div class="loading-overlay" *ngIf="loading">
+    <p-progressSpinner aria-label="Loading"></p-progressSpinner>
+  </div>
   <p-panel class="col-12 md-8">
     <ng-template pTemplate="header">
       <div class="flex align-items-center justify-content-between w-full">
