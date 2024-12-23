@@ -19,6 +19,7 @@ import { DividerModule } from 'primeng/divider';
 import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
 import { ElectronService } from '../services/electron.service';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-create-article',
@@ -36,7 +37,8 @@ import { ElectronService } from '../services/electron.service';
     DividerModule,
     PanelModule,
     InputTextareaModule,
-    CardModule
+    CardModule,
+    ProgressSpinnerModule
   ],
   templateUrl: './create-article.component.html',
   styleUrls: ['./create-article.component.css'],
@@ -55,6 +57,7 @@ export class CreateArticleComponent implements OnInit {
   pendingInvalidFieldId: string | null = null;
   emptyFormData: any;
   originalArticleData: any = null;
+  loading: boolean = false;
 
   showRevertButton = false;
 
@@ -160,6 +163,7 @@ export class CreateArticleComponent implements OnInit {
   }
 
   loadArticleData(id: string): void {
+    this.loading = true;
     this.newsService.getArticle(id).subscribe(article => {
       this.createArticleForm.patchValue({
         title: article.title,
@@ -171,6 +175,7 @@ export class CreateArticleComponent implements OnInit {
         image_media_type: article.image_media_type || ''
       });
       this.originalArticleData = { ...this.createArticleForm.value };
+      this.loading = false;
       this.showRevertButton = true;
 
       if (article.image_data && article.image_media_type) {
